@@ -1,0 +1,80 @@
+body {margin: 0; padding: 0; font-size: 100%; line-height: 1.5;}
+article, aside, figcaption, figure, footer, header, nav, section {display: block;}
+h1, h2, h3, h4 {margin: 1em 0 .5em; line-height: 1.25;}
+h1 {font-size: 2em;}
+h2 {font-size: 1.5em;}
+h3 {font-size: 1.2em;}
+ul, ol {margin: 1em 0; padding-left: 40px;}
+p, figure {margin: 1em 0;}
+a img {border: none;}
+sup, sub {line-height: 0;}
+
+.form-control.input-field {width: auto;
+                           display: inline-block;}
+
+li.input {list-style: none;
+          width:auto;
+          padding-bottom: 20px;
+          color: #585858;
+          font-weight: bold;}
+
+li.item {list-style: none;
+         font-size: 16px;
+         padding-left: 10px;
+         color: #585858;
+         font-weight: bold;}
+
+li.autocompletion-item {list-style: none;}
+
+.autocompletion-list-part {position: absolute;
+                           float: right;
+                           left: 50px;
+                           top: 150px;
+                           z-index: 100;}
+
+ul.autocompletion-list {Background: #eee;
+                        padding-left: 15px;
+                        padding-right: 15px;
+                        border-radius: 5px;}
+.my-list {
+    display: inline-block;
+    margin-left: 30px;}
+
+.autocomplete {
+    position: relative;
+    display: inline-block;
+    margin-top: 50px;
+    margin-left: 50px;
+    width: 500px;
+    min-height: 300px;}
+
+.autocomplete h1 {
+    text-align: center;
+    font-style: italic;
+    /* width: auto; */
+}
+
+.vegetable h1 {
+    color: #51C151;}
+
+
+.fruit h1 {
+    color: #DA2842;;
+}
+
+.fruit .check {color: #DA2842;}
+
+.vegetable .check {color: #51C151;}
+
+p {width: auto;}
+
+.button-ok {
+    margin-left: 10px;
+}
+
+.title {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    color: #9f9f9f;
+}

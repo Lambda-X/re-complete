@@ -1,0 +1,3 @@
+{:require  [re-complete.example]
+ :init-fns [re-complete.example/main]
+ :compiler-options {}}
