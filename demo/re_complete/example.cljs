@@ -1,6 +1,6 @@
 (ns re-complete.example
   (:require-macros [reagent.ratom :refer [reaction]])
-  (:require [re-complete.core :as autocomplete]
+  (:require [re-complete.core :as re-complete]
             [re-complete.autocomplete-data :as data]
             [reagent.core :as reagent]
             [re-frame.core :refer [register-handler
@@ -49,9 +49,10 @@
 
 ;; --- VIEW --- ;;
 
-(def my-lists [["vegetable" data/vegetables {:filter-regex "[]()"
+(def my-lists [["vegetable" data/vegetables {:exclude-chars "[]()"
                                              :sort-fn count}]
-               ["fruit" data/fruits {:filter-regex "?"}]])
+               ["fruit" data/fruits {:exclude-chars "?"}]
+               ["grain" data/grains]])
 
 (defn list-view [items]
   (map (fn [item]
@@ -93,7 +94,7 @@
             [:span {:className "glyphicon glyphicon-ok check"}]]]]
          (list-view @get-list)]]
        [:div.autocompletion-list-part
-        [autocomplete/autocompletion-list list-name]]]])))
+        [re-complete/autocompletion-list list-name]]]])))
 
 
 (defn my-app []
