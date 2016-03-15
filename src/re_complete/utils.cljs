@@ -30,20 +30,20 @@
 
 (defn partition-by-regexp
   "Function partitions characters from string into multiple strings by given regexp"
-  [word filter-regex]
+  [word exclude-chars]
   (map #(string/join "" %)
-       (partition-by #(re-find (str-to-pattern filter-regex) %) (mapv str word))))
+       (partition-by #(re-find (str-to-pattern exclude-chars) %) (mapv str word))))
 
 
 (defn autocomplete-options
   "Autocomplete options for word"
   [input items options]
   (let [last-string (last (string/split input #" "))
-        filter-regex (:filter-regex options)
+        exclude-chars (:exclude-chars options)
         sort-fn (:sort-fn options)
         autocomplete-items (items-to-autocomplete items last-string)]
-    (if filter-regex
-      (if (= (first last-string) (re-find (str-to-pattern filter-regex) (str (first last-string))))
+    (if exclude-chars
+      (if (= (first last-string) (re-find (str-to-pattern exclude-chars) (str (first last-string))))
         (->> 1
              (subs last-string)
              (items-to-autocomplete items)

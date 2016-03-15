@@ -7,6 +7,10 @@
             [re-complete.app :as app]))
 
 
+(def exclude-chars-default "")
+
+(def sort-fn-default first)
+
 
 ;; --- Handlers ---
 
@@ -16,14 +20,14 @@
    (let [linked-component-keyword (keyword linked-component-key)
          previous-input (get-in db [:autocomplete :linked-components linked-component-keyword :text])
          sort-fn (:sort-fn options)
-         filter-regex (:filter-regex options)
-         filled-options (cond (and filter-regex sort-fn) options
-                              filter-regex {:filter-regex filter-regex
-                                            :sort-fn first}
-                              sort-fn {:filter-regex ""
+         exclude-chars (:exclude-chars options)
+         filled-options (cond (and exclude-chars sort-fn) options
+                              exclude-chars {:exclude-chars exclude-chars
+                                             :sort-fn sort-fn-default}
+                              sort-fn {:exclude-chars exclude-chars-default
                                        :sort-fn sort-fn}
-                              :else {:filter-regex ""
-                                     :sort-fn first})]
+                              :else {:exclude-chars-regex exclude-chars-default
+                                     :sort-fn sort-fn-default})]
      (-> db
          (assoc-in [:autocomplete :linked-components linked-component-keyword] {:text input
                                                                                 :change-index 0
@@ -45,7 +49,7 @@
                                (get-in db [:autocomplete :linked-components linked-component-key :change-index])
                                selected-word
                                linked-component-key
-                               (get-in db [:autocomplete :linked-components linked-component-key :options :filter-regex]))))
+                               (get-in db [:autocomplete :linked-components linked-component-key :options :exclude-chars]))))
 
 ;; --- Subscriptions ---
 
