@@ -19,15 +19,3 @@
                                       (dispatch [:clear-autocomplete-items linked-component-keyword]))}
                       item])
                    @items-to-autocomplete))))))
-
-(defn autocomplete-fn
-  "Function merges :autocomplete into app state and calls appropriate handlers"
-  ([linked-component-key input autocomplete-data]
-   (autocomplete-fn linked-component-key input autocomplete-data {:options {:new-item-regex ""
-                                                                            :sort-fn first}}))
-  ([linked-component-key input autocomplete-data options]
-   (let [linked-component-keyword (keyword linked-component-key)
-         previous-input (subscribe [:get-previous-input linked-component-keyword])
-         all-options (:options options)]
-     (dispatch [:autocomplete-component linked-component-keyword all-options input])
-     (dispatch [:autocomplete linked-component-keyword @previous-input input autocomplete-data]))))

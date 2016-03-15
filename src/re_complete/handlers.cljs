@@ -12,27 +12,31 @@
 
 (register-handler
  :autocomplete-component
- (fn [db [_ linked-component-key options text]]
-   (assoc-in db [:autocomplete :linked-components linked-component-key] {:text text
-                                                                         :change-index 0
-                                                                         :current-word ""
-                                                                         :completions []
-                                                                         :options options})))
+ (fn [db [_ linked-component-key input autocomplete-data options]]
+   (let [linked-component-keyword (keyword linked-component-key)
+         previous-input (get-in db [:autocomplete :linked-components linked-component-keyword :text])
+         sort-fn (:sort-fn options)
+         filter-regex (:filter-regex options)
+         filled-options (cond (and filter-regex sort-fn) options
+                              filter-regex {:filter-regex filter-regex
+                                            :sort-fn first}
+                              sort-fn {:filter-regex ""
+                                       :sort-fn sort-fn}
+                              :else {:filter-regex ""
+                                     :sort-fn first})]
+     (-> db
+         (assoc-in [:autocomplete :linked-components linked-component-keyword] {:text input
+                                                                                :change-index 0
+                                                                                :current-word ""
+                                                                                :completions []
+                                                                                :options filled-options})
+         (app/autocomplete linked-component-keyword previous-input input autocomplete-data filled-options)))))
+
 (register-handler
  :clear-autocomplete-items
  (fn [db [_ linked-component-key]]
    (assoc-in db [:autocomplete :linked-components linked-component-key :completions] [])))
 
-
-(register-handler
- :autocomplete
- (fn [db [_ linked-component-key previous-input input autocomplete-data]]
-   (let [options (get-in db [:autocomplete :linked-components linked-component-key :options])]
-     (app/autocomplete db linked-component-key previous-input input autocomplete-data (if options
-                                                                                        (if (:sort-fn options)
-                                                                                          options
-                                                                                          (assoc options :sort-fn first))
-                                                                                        {:options {:sort-fn first}})))))
 
 (register-handler
  :add-autocompleted-word
@@ -41,7 +45,7 @@
                                (get-in db [:autocomplete :linked-components linked-component-key :change-index])
                                selected-word
                                linked-component-key
-                               (get-in db [:autocomplete :linked-components linked-component-key :options :new-item-regex]))))
+                               (get-in db [:autocomplete :linked-components linked-component-key :options :filter-regex]))))
 
 ;; --- Subscriptions ---
 

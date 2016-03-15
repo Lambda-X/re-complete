@@ -49,9 +49,9 @@
 
 ;; --- VIEW --- ;;
 
-(def my-lists [["vegetable" data/vegetables {:options {:new-item-regex "[]()"
-                                                       :sort-fn count}}]
-               ["fruit" data/fruits]])
+(def my-lists [["vegetable" data/vegetables {:filter-regex "[]()"
+                                             :sort-fn count}]
+               ["fruit" data/fruits {:filter-regex "?"}]])
 
 (defn list-view [items]
   (map (fn [item]
@@ -77,13 +77,15 @@
                    :value @get-input
                    :on-change (fn [event]
                                 (if options
-                                  (autocomplete/autocomplete-fn list-name
-                                                                (.. event -target -value)
-                                                                data-to-autocomplete
-                                                                options)
-                                  (autocomplete/autocomplete-fn list-name
-                                                                (.. event -target -value)
-                                                                data-to-autocomplete)))}
+                                  (dispatch [:autocomplete-component
+                                             list-name
+                                             (.. event -target -value)
+                                             data-to-autocomplete
+                                             options])
+                                  (dispatch [:autocomplete-component
+                                             list-name
+                                             (.. event -target -value)
+                                             data-to-autocomplete])))}
            [:button {:type "button"
                      :className "btn btn-default button-ok"
                      :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
