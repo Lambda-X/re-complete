@@ -4,7 +4,7 @@
 
 (defn autocomplete
   "Function finds the index where the change occured and based on this index makes appropriate changes"
-  [db linked-component-key previous-input input autocomplete-data options]
+  [db linked-component-key previous-input input dictionary options]
   (let [index (count (take-while #(identical? (first %) (second %))
                                  (map vector previous-input input)))
         new-index (if (< (count previous-input) (count input))
@@ -23,7 +23,7 @@
         (assoc-in [:autocomplete :linked-components (keyword linked-component-key) :current-word]
                   current-word)
         (assoc-in [:autocomplete :linked-components (keyword linked-component-key) :completions]
-                  (vec (utils/autocomplete-options current-word autocomplete-data options))))))
+                  (vec (utils/autocomplete-options current-word dictionary options))))))
 
 (defn add-autocompleted-word
   "Updates text in app state"

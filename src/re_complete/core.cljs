@@ -3,7 +3,7 @@
             [re-frame.core :refer [dispatch subscribe]]
             [clojure.string :as string]))
 
-(defn autocompletion-list
+(defn completions
   "Render list of the items to autocomplete.
   Every item of the list is dispatched to the right place in the right input with :on-click event."
   [linked-component-key]

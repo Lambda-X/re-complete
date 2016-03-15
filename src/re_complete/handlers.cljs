@@ -16,7 +16,7 @@
 
 (register-handler
  :autocomplete-component
- (fn [db [_ linked-component-key input autocomplete-data options]]
+ (fn [db [_ linked-component-key input dictionary options]]
    (let [linked-component-keyword (keyword linked-component-key)
          previous-input (get-in db [:autocomplete :linked-components linked-component-keyword :text])
          sort-fn (:sort-fn options)
@@ -26,7 +26,7 @@
                                              :sort-fn sort-fn-default}
                               sort-fn {:exclude-chars exclude-chars-default
                                        :sort-fn sort-fn}
-                              :else {:exclude-chars-regex exclude-chars-default
+                              :else {:exclude-chars exclude-chars-default
                                      :sort-fn sort-fn-default})]
      (-> db
          (assoc-in [:autocomplete :linked-components linked-component-keyword] {:text input
@@ -34,7 +34,7 @@
                                                                                 :current-word ""
                                                                                 :completions []
                                                                                 :options filled-options})
-         (app/autocomplete linked-component-keyword previous-input input autocomplete-data filled-options)))))
+         (app/autocomplete linked-component-keyword previous-input input dictionary filled-options)))))
 
 (register-handler
  :clear-autocomplete-items

@@ -3,13 +3,13 @@
 
 (defn items-to-autocomplete
   "List of the items to autocomplete by given input and list of the all items"
-  [items input]
+  [dictionary input]
   (let [new-items
         (if (= (re-find #"[aA-zZ]" (str (first input))) nil)
           []
           (if (= (string/upper-case (first input)) (first input))
-            (map string/capitalize items)
-            (map string/lower-case items)))]
+            (map string/capitalize dictionary)
+            (map string/lower-case dictionary)))]
     (filter #(string/starts-with? % input) new-items)))
 
 (defn regex-char-esc-smap

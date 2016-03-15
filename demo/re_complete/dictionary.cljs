@@ -1,4 +1,4 @@
-(ns re-complete.autocomplete-data)
+(ns re-complete.dictionary)
 
 (def vegetables '("Amaranth"
                   "Arrowroot"

@@ -1,7 +1,7 @@
 (ns re-complete.example
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-complete.core :as re-complete]
-            [re-complete.autocomplete-data :as data]
+            [re-complete.dictionary :as dictionary]
             [reagent.core :as reagent]
             [re-frame.core :refer [register-handler
                                    dispatch
@@ -49,10 +49,10 @@
 
 ;; --- VIEW --- ;;
 
-(def my-lists [["vegetable" data/vegetables {:exclude-chars "[]()"
+(def my-lists [["vegetable" dictionary/vegetables {:exclude-chars "[]()"
                                              :sort-fn count}]
-               ["fruit" data/fruits {:exclude-chars "?"}]
-               ["grain" data/grains]])
+               ["fruit" dictionary/fruits {:exclude-chars "?"}]
+               ["grain" dictionary/grains]])
 
 (defn list-view [items]
   (map (fn [item]
@@ -60,9 +60,9 @@
        items))
 
 (defn render-list
-  ([list-name data-to-autocomplete]
-   (render-list list-name data-to-autocomplete nil))
-  ([list-name data-to-autocomplete options]
+  ([list-name dictionary]
+   (render-list list-name dictionary nil))
+  ([list-name dictionary options]
    (let [get-input (subscribe [:get-previous-input list-name])
          get-list (subscribe [:get-list list-name])]
      [:div {:className (str list-name " my-list")}
@@ -81,12 +81,12 @@
                                   (dispatch [:autocomplete-component
                                              list-name
                                              (.. event -target -value)
-                                             data-to-autocomplete
+                                             dictionary
                                              options])
                                   (dispatch [:autocomplete-component
                                              list-name
                                              (.. event -target -value)
-                                             data-to-autocomplete])))}
+                                             dictionary])))}
            [:button {:type "button"
                      :className "btn btn-default button-ok"
                      :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
@@ -94,7 +94,7 @@
             [:span {:className "glyphicon glyphicon-ok check"}]]]]
          (list-view @get-list)]]
        [:div.autocompletion-list-part
-        [re-complete/autocompletion-list list-name]]]])))
+        [re-complete/completions list-name]]]])))
 
 
 (defn my-app []
