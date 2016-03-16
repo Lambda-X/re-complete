@@ -15,11 +15,9 @@
 ;; --- Handlers ---
 
 (register-handler
- :autocomplete-component
- (fn [db [_ linked-component-key input dictionary options]]
-   (let [linked-component-keyword (keyword linked-component-key)
-         previous-input (get-in db [:autocomplete :linked-components linked-component-keyword :text])
-         sort-fn (:sort-fn options)
+ :options
+ (fn [db [_ linked-component-key options]]
+   (let [sort-fn (:sort-fn options)
          exclude-chars (:exclude-chars options)
          filled-options (cond (and exclude-chars sort-fn) options
                               exclude-chars {:exclude-chars exclude-chars
@@ -28,13 +26,26 @@
                                        :sort-fn sort-fn}
                               :else {:exclude-chars exclude-chars-default
                                      :sort-fn sort-fn-default})]
+     (assoc-in db [:autocomplete :linked-components (keyword linked-component-key)] {:options filled-options}))))
+
+(register-handler
+ :dictionary
+ (fn [db [_ linked-component-key dictionary]]
+   (assoc-in db [:autocomplete :linked-components (keyword linked-component-key) :dictionary] dictionary)))
+
+(register-handler
+ :input
+ (fn [db [_ linked-component-key input]]
+   (let [linked-component-keyword (keyword linked-component-key)
+         previous-input (get-in db [:autocomplete :linked-components linked-component-keyword :text])
+         options (get-in db [:autocomplete :linked-components linked-component-keyword :options])
+         dictionary (get-in db [:autocomplete :linked-components linked-component-keyword :dictionary])]
      (-> db
-         (assoc-in [:autocomplete :linked-components linked-component-keyword] {:text input
-                                                                                :change-index 0
-                                                                                :current-word ""
-                                                                                :completions []
-                                                                                :options filled-options})
-         (app/autocomplete linked-component-keyword previous-input input dictionary filled-options)))))
+         (assoc-in [:autocomplete :linked-components linked-component-keyword :text] input)
+         (assoc-in [:autocomplete :linked-components linked-component-keyword :change-index] 0)
+         (assoc-in [:autocomplete :linked-components linked-component-keyword :current-word] "")
+         (assoc-in [:autocomplete :linked-components linked-component-keyword :completions] [])
+         (app/autocomplete linked-component-keyword previous-input input dictionary options)))))
 
 (register-handler
  :clear-autocomplete-items

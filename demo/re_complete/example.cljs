@@ -50,7 +50,7 @@
 ;; --- VIEW --- ;;
 
 (def my-lists [["vegetable" dictionary/vegetables {:exclude-chars "[]()"
-                                             :sort-fn count}]
+                                                   :sort-fn count}]
                ["fruit" dictionary/fruits {:exclude-chars "?"}]
                ["grain" dictionary/grains]])
 
@@ -65,42 +65,34 @@
   ([list-name dictionary options]
    (let [get-input (subscribe [:get-previous-input list-name])
          get-list (subscribe [:get-list list-name])]
-     [:div {:className (str list-name " my-list")}
-      [:div {:className "panel panel-default autocomplete"}
-       [:div {:className "panel-heading"}
-        [:h1 (string/capitalize (str list-name "s"))]]
-       [:div.panel-body
-        [:ul.checklist
-         [:li.input
-          [:input {:type "text"
-                   :className "form-control input-field"
-                   :placeholder (str list-name " name")
-                   :value @get-input
-                   :on-change (fn [event]
-                                (if options
-                                  (dispatch [:autocomplete-component
-                                             list-name
-                                             (.. event -target -value)
-                                             dictionary
-                                             options])
-                                  (dispatch [:autocomplete-component
-                                             list-name
-                                             (.. event -target -value)
-                                             dictionary])))}
-           [:button {:type "button"
-                     :className "btn btn-default button-ok"
-                     :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
-                                    (dispatch [:clear-input list-name]))}
-            [:span {:className "glyphicon glyphicon-ok check"}]]]]
-         (list-view @get-list)]]
-       [:div.autocompletion-list-part
-        [re-complete/completions list-name]]]])))
-
+     (dispatch [:options list-name options])
+     (dispatch [:dictionary list-name dictionary])
+     (fn []
+       [:div {:className (str list-name " my-list")}
+        [:div {:className "panel panel-default autocomplete"}
+         [:div {:className "panel-heading"}
+          [:h1 (string/capitalize (str list-name "s"))]]
+         [:div.panel-body
+          [:ul.checklist
+           [:li.input
+            [:input {:type "text"
+                     :className "form-control input-field"
+                     :placeholder (str list-name " name")
+                     :value @get-input
+                     :on-change (fn [event]
+                                  (dispatch [:input list-name (.. event -target -value)]))}
+             [:button {:type "button"
+                       :className "btn btn-default button-ok"
+                       :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
+                                      (dispatch [:clear-input list-name]))}
+              [:span {:className "glyphicon glyphicon-ok check"}]]]]
+           (list-view @get-list)]]
+         [:div.autocompletion-list-part
+          [re-complete/completions list-name]]]]))))
 
 (defn my-app []
-  [:div.my-app
-   (doall (map #(apply render-list %) my-lists))])
-
+  (into [:div.my-app]
+        (map #(into [render-list] %) my-lists)))
 
 ;; --- Main app fn ---
 
