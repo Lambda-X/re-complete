@@ -1,15 +1,15 @@
 # re-complete
 re-complete is a text completion library for re-frame applications
 
-Library provides the possibilty to set `new-item-regex` and `sort-fn` through options. Using the `new-item-regex` option,
+Library provides the possibilty to set `exclude-chars` and `sort-fn` through options. Using the `exclude-chars` option,
 the user can describe which type of characters he wants to ignore at the beginning and at the end of the word.
 
-For example, if the `new-item-regex` has a value `"()"` , the first eligible item of the input to autocomplete
+For example, if the `exclude-chars` has a value `"()"` , the first eligible item of the input to autocomplete
 will be the first item after the `(` ,or `)`.
 
 ![alt tag](http://s21.postimg.org/hc3lopv6v/Screen_Shot_2016_03_14_at_15_13_14.png)
 
-If the `new-item-regex` is not set, the first item of the input to autocomplete in this particular case is `(`.
+If the `exclude-chars` is not set, the first item of the input to autocomplete in this particular case is `(`.
 The list of the items to autocomplete is empty because in my autocompletion-data I don't have any words starting on `(`.
 
 ![alt tag](http://s14.postimg.org/90jw4k7a9/Screen_Shot_2016_03_14_at_15_13_27.png)
@@ -20,30 +20,43 @@ If the `sort-fn` option is not provided, items to autocomplete are sorted by nat
 
 # Usage
 
-The re-autocomplete library has only two functions you need to use.
+The re-autocomplete library has only few functions you need to use.
 
-The function [autocomplete-fn](https://github.com/ScalaConsultants/re-complete/blob/master/src/re_complete/core.cljs#L23)
-is the function you should call in you `on-change` handler, it's responsible for updating the state of the autocomplete
-in the app-db.
+For setting the `options` you need to `dispatch` your `options` (`exclude-chars` `sort-fn`). 
+This dispatch function takes as argument `linked-component-key` (name for the input) and `options`
 
-This functions takes as arguments:
-* `linked-component-key` - this is the name for the input
-* `input` - current value of the input
-* `autocomplete-data` - list of the strings to autocomplete
-* `options` - optional argument, map of the options (`new-item-regex` , `sort-fn`)
+```Clojure
+(dispatch [:options list-name options])
+```
 
-[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L80)
+For setting the `dictionary` you need to dispatch your `dictionary` (list of your autocomplete options).
+This dispatch function takes as arguments `linked-component-key` (name for the input) and `dictionary`
+
+```Clojure
+(dispatch [:options list-name dictionary])
+```
+
+The last item you need to dispatch is your `input`.
+This dispatch function takes as arguments `linked-component-key` (name for the input) and `input`
+
+```Clojure
+(dispatch [:options list-name input])
+```
+[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L62)
 
 ```clojure
-[:input {:type "text"
-         :placeholder (str list-name " name")
-         :value ""
-         :on-change (fn [event]
-                      (autocomplete/autocomplete-fn "vegetables"
-                                                    (.. event -target -value)
-                                                   '("carrot" "asparagus" "broccoli")
-                                                    {:options {:new-item-regex "[]()"
-                                                               :sort-fn count}}))}]
+((dispatch [:options "vegetable" {:exclude-chars "()",
+                                  :sort-fn count}])
+ (dispatch [:dictionary "vegetable" '("broccoli" "asparagus" "appricot" "cale")])
+     (fn []
+        [:ul
+           [:li
+            [:input {:type "text"
+                     :value ""
+                     :on-change (fn [event]
+                                  (dispatch [:input list-name (.. event -target -value)]))}]]]
+            [:div.autocompletion-list-part
+          [re-complete/completions "vegetable]]))
 ```
 
 When the change of input occurred (for example we will write `a` to input), in our app-state we will have
@@ -53,21 +66,22 @@ When the change of input occurred (for example we will write `a` to input), in o
                 {:vegetable {:text ""
                              :change-index 0
                              :current-word "a"
-                             :completions ["asparagus"]
-                             :options {:new-item-regex "[]()",
+                             :completions ["appricot" "asparagus"]
+                             :dictionary '("broccoli" "asparagus" "appricot" "cale")
+                             :options {:exclude-chars "()",
                                        :sort-fn count}}}}}
 ```
 
-The second function we need is [autocompletion-list](https://github.com/ScalaConsultants/re-complete/blob/master/src/re_complete/core.cljs#L6) 
+The last function we need is `completions`
 This function displays list of the items for autocompletition. After click on the item, the item is placed in the right position in text. 
 
-`autocompletion-list` takes as an argument `linked-component-key` - name of the input
+`completions` takes as an argument `linked-component-key` - name of the input
 
-[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L94)
+[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L91)
 
 ```clojure
 [:div.autocompletion-list-part
-  [autocomplete/autocompletion-list "vegetable"]]
+  [autocomplete/completions "vegetable"]]
 ```
 
 # CSS styling
