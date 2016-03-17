@@ -57,11 +57,12 @@
 (register-handler
  :add-autocompleted-word
  (fn [db [_ linked-component-key selected-word]]
-   (app/add-autocompleted-word db
-                               (get-in db [:autocomplete :linked-components linked-component-key :change-index])
-                               selected-word
-                               linked-component-key
-                               (get-in db [:autocomplete :linked-components linked-component-key :options :exclude-chars]))))
+   (update-in db [:autocomplete :linked-components linked-component-key :text]
+              #(app/autocomplete-word-to-string
+                (get-in db [:autocomplete :linked-components linked-component-key :change-index])
+                (get-in db [:autocomplete :linked-components linked-component-key :options :exclude-chars])
+                %
+                selected-word))))
 
 ;; --- Subscriptions ---
 

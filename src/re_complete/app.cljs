@@ -48,45 +48,52 @@
          (sort-by sort-fn autocomplete-items))
        (sort-fn autocomplete-items)))))
 
-(defn autocomplete-regex-word
+(defn words-to-index
+  "Words to change index"
+  [index text]
+  (let [text-to-index (-> index
+                          inc
+                          (take text))]
+    (string/split (string/join "" text-to-index) #" ")))
+
+(defn index-of-word
+  "Index of word for autocompletion"
+  [index text]
+  (-> (words-to-index index text)
+      count
+      dec))
+
+(defn index-in-word
+  "Position index in word for autocompletion"
+  [index text]
+  (if (= (count (words-to-index index text)) 1)
+    index
+    (->> (words-to-index index text)
+         drop-last
+         (string/join "")
+         count inc
+         (- index))))
+
+(defn autocomplete-word-with-excluded-chars
   "Autocomplete word and ignore regex at the beginning and at the end of the word"
-  [index-in-word word word-to-autocomplete regex-item]
-  (let [partitioned-by-regex (vec (utils/partition-by-regexp word regex-item))
+  [index-in-word word word-to-autocomplete exclude-chars]
+  (let [partitioned-by-excluded-chars (vec (utils/partition-by-regexp word exclude-chars))
         index-of-part-to-autocomplete (-> index-in-word
                                           inc
                                           (take word)
-                                          (utils/partition-by-regexp regex-item)
+                                          (utils/partition-by-regexp exclude-chars)
                                           count
                                           dec)]
-    (->> (update-in partitioned-by-regex [index-of-part-to-autocomplete]
+    (->> (update-in partitioned-by-excluded-chars [index-of-part-to-autocomplete]
                     #(str word-to-autocomplete))
          (string/join ""))))
 
 (defn autocomplete-word-to-string
-  "Autocomplete regex-word to input string"
-  [index regex-item text word-to-autocomplete]
-  (let [text-to-index (-> index
-                          inc
-                          (take text))
-        words-to-index (string/split (string/join "" text-to-index) #" ")
-        index-of-word (-> words-to-index
-                          count
-                          dec)
-        position-index-in-word (if (= (count words-to-index) 1)
-                                 index
-                                 (->> words-to-index
-                                      drop-last
-                                      (string/join "")
-                                      count inc
-                                      (- index)))]
-    (->> (update-in (string/split text #" ") [index-of-word]
-                    #(autocomplete-regex-word position-index-in-word % word-to-autocomplete regex-item))
-         (string/join " "))))
-
-
-(defn add-autocompleted-word
-  "Updates text in app state"
-  [db change-index word linked-component-key regex-item]
-  (update-in db [:autocomplete :linked-components linked-component-key :text]
-             #(autocomplete-word-to-string change-index regex-item % word)))
-
+  "Autocomplete word with excluded chars to input string"
+  [index exclude-chars text word-to-autocomplete]
+  (->> (update-in (string/split text #" ") [(index-of-word index text)]
+                  #(autocomplete-word-with-excluded-chars (index-in-word index text)
+                                                          %
+                                                          word-to-autocomplete
+                                                          exclude-chars))
+       (string/join " ")))
