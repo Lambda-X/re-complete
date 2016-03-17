@@ -35,12 +35,12 @@
   "Autocomplete options for word"
   [input items options]
   (let [last-string (last (string/split input #" "))
-        exclude-chars (:exclude-chars options)
+        trim-chars (:trim-chars options)
         sort-fn (:sort-fn options)
         autocomplete-items (items-to-autocomplete items last-string)]
     (vec
-     (if exclude-chars
-       (if (= (first last-string) (re-find (utils/str-to-pattern exclude-chars) (str (first last-string))))
+     (if trim-chars
+       (if (= (first last-string) (re-find (utils/str-to-pattern trim-chars) (str (first last-string))))
          (->> 1
               (subs last-string)
               (items-to-autocomplete items)
@@ -74,26 +74,26 @@
          count inc
          (- index))))
 
-(defn autocomplete-word-with-excluded-chars
+(defn autocomplete-word-with-trimmed-chars
   "Autocomplete word and ignore regex at the beginning and at the end of the word"
-  [index-in-word word word-to-autocomplete exclude-chars]
-  (let [partitioned-by-excluded-chars (vec (utils/partition-by-regexp word exclude-chars))
+  [index-in-word word word-to-autocomplete trim-chars]
+  (let [partitioned-by-trimmed-chars (vec (utils/partition-by-regexp word trim-chars))
         index-of-part-to-autocomplete (-> index-in-word
                                           inc
                                           (take word)
-                                          (utils/partition-by-regexp exclude-chars)
+                                          (utils/partition-by-regexp trim-chars)
                                           count
                                           dec)]
-    (->> (update-in partitioned-by-excluded-chars [index-of-part-to-autocomplete]
+    (->> (update-in partitioned-by-trimmed-chars [index-of-part-to-autocomplete]
                     #(str word-to-autocomplete))
          (string/join ""))))
 
 (defn autocomplete-word-to-string
-  "Autocomplete word with excluded chars to input string"
-  [index exclude-chars text word-to-autocomplete]
+  "Autocomplete word with trimmed chars to input string"
+  [index trim-chars text word-to-autocomplete]
   (->> (update-in (string/split text #" ") [(index-of-word index text)]
-                  #(autocomplete-word-with-excluded-chars (index-in-word index text)
+                  #(autocomplete-word-with-trimmed-chars (index-in-word index text)
                                                           %
                                                           word-to-autocomplete
-                                                          exclude-chars))
+                                                          trim-chars))
        (string/join " ")))

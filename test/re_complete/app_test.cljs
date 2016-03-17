@@ -8,7 +8,7 @@
 
 (def word-to-autocomplete "broccolini")
 
-(def options {:exclude-chars "()"
+(def options {:trim-chars "()"
               :sort-fn count})
 
 (def dictionary '("appricot" "broccolini" "tomato" "bok choy" "bell peppers" "amaranth" "leek"))
@@ -34,9 +34,9 @@
 (deftest index-in-word
   (is (= (app/index-in-word (app/index previous-input input-text) input-text) 1)))
 
-(deftest autocomplete-word-with-excluded-chars
+(deftest autocomplete-word-with-trimmed-chars
   (let [change-index (app/index previous-input input-text)]
-    (is (= (app/autocomplete-word-with-excluded-chars (app/index-in-word change-index input-text) (app/current-word input-text change-index) word-to-autocomplete (:exclude-chars options)) "(broccolini"))))
+    (is (= (app/autocomplete-word-with-trimmed-chars (app/index-in-word change-index input-text) (app/current-word input-text change-index) word-to-autocomplete (:trim-chars options)) "(broccolini"))))
 
 (deftest autocomplete-word-to-string
-  (is (= (app/autocomplete-word-to-string (app/index previous-input input-text) (:exclude-chars options) input-text word-to-autocomplete) "appricot (broccolini tomato")))
+  (is (= (app/autocomplete-word-to-string (app/index previous-input input-text) (:trim-chars options) input-text word-to-autocomplete) "appricot (broccolini tomato")))

@@ -7,7 +7,7 @@
             [re-complete.app :as app]))
 
 
-(def exclude-chars-default "")
+(def trim-chars-default "")
 
 (def sort-fn-default first)
 
@@ -18,13 +18,13 @@
  :options
  (fn [db [_ linked-component-key options]]
    (let [sort-fn (:sort-fn options)
-         exclude-chars (:exclude-chars options)
-         filled-options (cond (and exclude-chars sort-fn) options
-                              exclude-chars {:exclude-chars exclude-chars
-                                             :sort-fn sort-fn-default}
-                              sort-fn {:exclude-chars exclude-chars-default
+         trim-chars (:trim-chars options)
+         filled-options (cond (and trim-chars sort-fn) options
+                              trim-chars {:trim-chars trim-chars
+                                          :sort-fn sort-fn-default}
+                              sort-fn {:trim-chars trim-chars-default
                                        :sort-fn sort-fn}
-                              :else {:exclude-chars exclude-chars-default
+                              :else {:trim-chars trim-chars-default
                                      :sort-fn sort-fn-default})]
      (assoc-in db [:autocomplete :linked-components (keyword linked-component-key)] {:options filled-options}))))
 
@@ -60,7 +60,7 @@
    (update-in db [:autocomplete :linked-components linked-component-key :text]
               #(app/autocomplete-word-to-string
                 (get-in db [:autocomplete :linked-components linked-component-key :change-index])
-                (get-in db [:autocomplete :linked-components linked-component-key :options :exclude-chars])
+                (get-in db [:autocomplete :linked-components linked-component-key :options :trim-chars])
                 %
                 selected-word))))
 

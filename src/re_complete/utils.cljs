@@ -19,6 +19,6 @@
 
 (defn partition-by-regexp
   "Function partitions characters from string into multiple strings by given regexp"
-  [word exclude-chars]
+  [word trim-chars]
   (map #(string/join "" %)
-       (partition-by #(re-find (str-to-pattern exclude-chars) %) (mapv str word))))
+       (partition-by #(re-find (str-to-pattern trim-chars) %) (mapv str word))))

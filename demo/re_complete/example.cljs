@@ -49,9 +49,9 @@
 
 ;; --- VIEW --- ;;
 
-(def my-lists [["vegetable" dictionary/vegetables {:exclude-chars "[]()"
+(def my-lists [["vegetable" dictionary/vegetables {:trim-chars "[]()"
                                                    :sort-fn count}]
-               ["fruit" dictionary/fruits {:exclude-chars "?"}]
+               ["fruit" dictionary/fruits {:trim-chars "?"}]
                ["grain" dictionary/grains]])
 
 (defn list-view [items]
