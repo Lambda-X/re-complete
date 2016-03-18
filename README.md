@@ -1,15 +1,15 @@
 # re-complete
 re-complete is a text completion library for re-frame applications
 
-Library provides the possibilty to set `exclude-chars` and `sort-fn` through options. Using the `exclude-chars` option,
+Library provides the possibilty to set `trim-chars`, `sort-fn` and `case-sensitive?` through options. Using the `trim-chars` option,
 the user can describe which type of characters he wants to ignore at the beginning and at the end of the word.
 
-For example, if the `exclude-chars` has a value `"()"` , the first eligible item of the input to autocomplete
+For example, if the `trim-chars` has a value `"()"` , the first eligible item of the input to autocomplete
 will be the first item after the `(` ,or `)`.
 
 ![alt tag](http://s21.postimg.org/hc3lopv6v/Screen_Shot_2016_03_14_at_15_13_14.png)
 
-If the `exclude-chars` is not set, the first item of the input to autocomplete in this particular case is `(`.
+If the `trim-chars` is not set, the first item of the input to autocomplete in this particular case is `(`.
 The list of the items to autocomplete is empty because in my autocompletion-data I don't have any words starting on `(`.
 
 ![alt tag](http://s14.postimg.org/90jw4k7a9/Screen_Shot_2016_03_14_at_15_13_27.png)
@@ -18,11 +18,14 @@ The `sort-fn` option should be the function for sorting items in the autocomplet
 For example if the value of the `sort-fn` will be `count`, the items to autocomplete will be sorted by the count of their characters.
 If the `sort-fn` option is not provided, items to autocomplete are sorted by natural order (alphabetically).
 
+The `case-sentitive?` option has a default value `false`. So if you want your autocomplete to be case
+sensitive, you should set `case-sensitive? true`
+
 # Usage
 
 The re-autocomplete library has only few functions you need to use.
 
-For setting the `options` you need to `dispatch` your `options` (`exclude-chars` `sort-fn`). 
+For setting the `options` you need to `dispatch` your `options` (`exclude-chars` `sort-fn` `case-sensitive?`). 
 This dispatch function takes as argument `linked-component-key` (name for the input) and `options`
 
 ```Clojure
@@ -69,7 +72,8 @@ When the change of input occurred (for example we will write `a` to input), in o
                              :completions ["appricot" "asparagus"]
                              :dictionary '("broccoli" "asparagus" "appricot" "cale")
                              :options {:exclude-chars "()",
-                                       :sort-fn count}}}}}
+                                       :sort-fn count
+                                       :case-sensitive? false}}}}}
 ```
 
 The last function we need is `completions`
