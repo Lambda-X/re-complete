@@ -25,7 +25,7 @@ sensitive, you should set `case-sensitive? true`
 
 The re-autocomplete library has only few functions you need to use.
 
-For setting the `options` you need to `dispatch` your `options` (`exclude-chars` `sort-fn` `case-sensitive?`). 
+For setting the `options` you need to `dispatch` your `options` (`trim-chars` `sort-fn` `case-sensitive?`). 
 This dispatch function takes as argument `linked-component-key` (name for the input) and `options`
 
 ```Clojure
@@ -48,7 +48,7 @@ This dispatch function takes as arguments `linked-component-key` (name for the i
 [example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L62)
 
 ```clojure
-((dispatch [:options "vegetable" {:exclude-chars "()",
+((dispatch [:options "vegetable" {:trim-chars "()",
                                   :sort-fn count}])
  (dispatch [:dictionary "vegetable" '("broccoli" "asparagus" "appricot" "cale")])
      (fn []
@@ -71,7 +71,7 @@ When the change of input occurred (for example we will write `a` to input), in o
                              :current-word "a"
                              :completions ["appricot" "asparagus"]
                              :dictionary '("broccoli" "asparagus" "appricot" "cale")
-                             :options {:exclude-chars "()",
+                             :options {:trim-chars "()",
                                        :sort-fn count
                                        :case-sensitive? false}}}}}
 ```
