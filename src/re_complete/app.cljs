@@ -2,16 +2,18 @@
   (:require [re-complete.utils :as utils]
             [clojure.string :as string]))
 
+
+(defn case-sensitivity [case-sensitive? dictionary-item input]
+  (if case-sensitive?
+    (string/starts-with? dictionary-item input)
+    (string/starts-with? (string/lower-case dictionary-item) (string/lower-case input))))
+
 (defn items-to-autocomplete
   "List of the items to autocomplete by given input and list of the all items"
-  [dictionary input]
-  (let [new-items
-        (if (= (re-find #"[aA-zZ]" (str (first input))) nil)
-          []
-          (if (= (string/upper-case (first input)) (first input))
-            (map string/capitalize dictionary)
-            (map string/lower-case dictionary)))]
-    (filter #(string/starts-with? % input) new-items)))
+  [case-sensitive? dictionary input]
+  (if (= input nil)
+    []
+    (filter #(case-sensitivity case-sensitive? % input) dictionary)))
 
 (defn index [previous-input input]
   "Finds the index where the change occured"
@@ -33,17 +35,18 @@
 
 (defn completions
   "Autocomplete options for word"
-  [input items options]
+  [input dictionary options]
   (let [last-string (last (string/split input #" "))
         trim-chars (:trim-chars options)
         sort-fn (:sort-fn options)
-        autocomplete-items (items-to-autocomplete items last-string)]
+        case-sensitive? (:case-sensitive? options)
+        autocomplete-items (items-to-autocomplete case-sensitive? dictionary last-string)]
     (vec
      (if trim-chars
        (if (= (first last-string) (re-find (utils/str-to-pattern trim-chars) (str (first last-string))))
          (->> 1
               (subs last-string)
-              (items-to-autocomplete items)
+              (items-to-autocomplete case-sensitive? dictionary)
               (sort-by sort-fn))
          (sort-by sort-fn autocomplete-items))
        (sort-fn autocomplete-items)))))
@@ -93,7 +96,7 @@
   [index trim-chars text word-to-autocomplete]
   (->> (update-in (string/split text #" ") [(index-of-word index text)]
                   #(autocomplete-word-with-trimmed-chars (index-in-word index text)
-                                                          %
-                                                          word-to-autocomplete
-                                                          trim-chars))
+                                                         %
+                                                         word-to-autocomplete
+                                                         trim-chars))
        (string/join " ")))

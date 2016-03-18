@@ -138,7 +138,7 @@
               "Clementine"
               "Watermelon"))
 
-(def grains '("Amaranth"
+(def grains '("(Amaranth"
               "Barley"
               "Brown Rice"
               "Brown Rice Bread"
