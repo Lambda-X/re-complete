@@ -17,7 +17,6 @@
 
 ;; --- Handlers ---
 
-
 (register-handler
  :initialize
  (fn

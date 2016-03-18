@@ -23,11 +23,11 @@
          case-sensitive? (:case-sensitive? options)
          filled-options (cond (and trim-chars sort-fn case-sensitive?) options
                               (and trim-chars case-sensitive?) {:trim-chars trim-chars
-                                                               :case-sensitive? true
-                                                               :sort-fn sort-fn-default}
+                                                                :case-sensitive? true
+                                                                :sort-fn sort-fn-default}
                               (and case-sensitive? sort-fn) {:case-sensitive? true
-                                                            :sort-fn sort-fn
-                                                            :trim-chars trim-chars-default}
+                                                             :sort-fn sort-fn
+                                                             :trim-chars trim-chars-default}
                               (and trim-chars sort-fn) {:trim-chars trim-chars
                                                         :sort-fn sort-fn
                                                         :case-sensitive? case-sensitive-default}
@@ -38,8 +38,8 @@
                                        :trim-chars trim-chars-default
                                        :case-sensitive? case-sensitive-default}
                               case-sensitive? {:case-sensitive? true
-                                              :trim-chars trim-chars-default
-                                              :sort-fn sort-fn-default}
+                                               :trim-chars trim-chars-default
+                                               :sort-fn sort-fn-default}
                               :else {:trim-chars trim-chars-default
                                      :sort-fn sort-fn-default
                                      :case-sensitive? case-sensitive-default})]
@@ -66,16 +66,16 @@
          (assoc-in [:autocomplete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))))))
 
 (register-handler
- :clear-autocomplete-items
+ :clear-complete-items
  (fn [db [_ linked-component-key]]
    (assoc-in db [:autocomplete :linked-components linked-component-key :completions] [])))
 
 
 (register-handler
- :add-autocompleted-word
+ :add-completed-word
  (fn [db [_ linked-component-key selected-word]]
    (update-in db [:autocomplete :linked-components linked-component-key :text]
-              #(app/autocomplete-word-to-string
+              #(app/complete-word-to-string
                 (get-in db [:autocomplete :linked-components linked-component-key :change-index])
                 (get-in db [:autocomplete :linked-components linked-component-key :options :trim-chars])
                 %
@@ -89,6 +89,6 @@
    (reaction (get-in @db [:autocomplete :linked-components (keyword linked-component-key) :text]))))
 
 (register-sub
- :get-items-to-autocomplete
+ :get-items-to-complete
  (fn [db [_ linked-component-key]]
    (reaction (get-in @db [:autocomplete :linked-components linked-component-key :completions]))))

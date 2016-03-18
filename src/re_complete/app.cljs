@@ -8,7 +8,7 @@
     (string/starts-with? dictionary-item input)
     (string/starts-with? (string/lower-case dictionary-item) (string/lower-case input))))
 
-(defn items-to-autocomplete
+(defn items-to-complete
   "List of the items to autocomplete by given input and list of the all items"
   [case-sensitive? dictionary input]
   (if (= input nil)
@@ -40,16 +40,16 @@
         trim-chars (:trim-chars options)
         sort-fn (:sort-fn options)
         case-sensitive? (:case-sensitive? options)
-        autocomplete-items (items-to-autocomplete case-sensitive? dictionary last-string)]
+        complete-items (items-to-complete case-sensitive? dictionary last-string)]
     (vec
      (if trim-chars
        (if (= (first last-string) (re-find (utils/str-to-pattern trim-chars) (str (first last-string))))
          (->> 1
               (subs last-string)
-              (items-to-autocomplete case-sensitive? dictionary)
+              (items-to-complete case-sensitive? dictionary)
               (sort-by sort-fn))
-         (sort-by sort-fn autocomplete-items))
-       (sort-fn autocomplete-items)))))
+         (sort-by sort-fn complete-items))
+       (sort-fn complete-items)))))
 
 (defn words-to-index
   "Words to change index"
@@ -77,26 +77,26 @@
          count inc
          (- index))))
 
-(defn autocomplete-word-with-trimmed-chars
+(defn complete-word-with-trimmed-chars
   "Autocomplete word and ignore regex at the beginning and at the end of the word"
-  [index-in-word word word-to-autocomplete trim-chars]
+  [index-in-word word word-to-complete trim-chars]
   (let [partitioned-by-trimmed-chars (vec (utils/partition-by-regexp word trim-chars))
-        index-of-part-to-autocomplete (-> index-in-word
+        index-of-part-to-complete (-> index-in-word
                                           inc
                                           (take word)
                                           (utils/partition-by-regexp trim-chars)
                                           count
                                           dec)]
-    (->> (update-in partitioned-by-trimmed-chars [index-of-part-to-autocomplete]
-                    #(str word-to-autocomplete))
+    (->> (update-in partitioned-by-trimmed-chars [index-of-part-to-complete]
+                    #(str word-to-complete))
          (string/join ""))))
 
-(defn autocomplete-word-to-string
+(defn complete-word-to-string
   "Autocomplete word with trimmed chars to input string"
-  [index trim-chars text word-to-autocomplete]
+  [index trim-chars text word-to-complete]
   (->> (update-in (string/split text #" ") [(index-of-word index text)]
-                  #(autocomplete-word-with-trimmed-chars (index-in-word index text)
+                  #(complete-word-with-trimmed-chars (index-in-word index text)
                                                          %
-                                                         word-to-autocomplete
+                                                         word-to-complete
                                                          trim-chars))
        (string/join " ")))
