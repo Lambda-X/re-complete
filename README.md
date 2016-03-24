@@ -79,7 +79,10 @@ When the change of input occurred (for example we will write `a` to input), in o
 The last function we need is `completions`
 This function displays list of the items for autocompletition. After click on the item, the item is placed in the right position in text. 
 
-`completions` takes as an argument `linked-component-key` - name of the input
+If you want to use custom callback function, you can add it as additional optional argument to `completions` function.
+
+`completions` takes as an argument `linked-component-key` - name of the input and optional argument `onclick-callback`
+
 
 [example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L91)
 
