@@ -6,6 +6,8 @@
 (defn completions
   "Render list of the items to autocomplete.
   Every item of the list is dispatched to the right place in the right input with :on-click event."
+  ([linked-component-key]
+   (completions linked-component-key nil))
   ([linked-component-key onclick-callback]
    (let [linked-component-keyword (keyword linked-component-key)
          items-to-autocomplete (subscribe [:get-items-to-complete linked-component-keyword])
@@ -17,19 +19,7 @@
                       [:li.autocompletion-item
                        {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                        (dispatch [:clear-complete-items linked-component-keyword])
-                                       onclick-callback)}
-                       item])
-                    @items-to-autocomplete))))))
-  ([linked-component-key]
-   (let [linked-component-keyword (keyword linked-component-key)
-         items-to-autocomplete (subscribe [:get-items-to-complete linked-component-keyword])
-         current-word (subscribe [:get-previous-input linked-component-keyword])]
-     (fn []
-       (when-not (string/blank? @current-word)
-         (into [:ul.autocompletion-list]
-               (map (fn [item]
-                      [:li.autocompletion-item
-                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
-                                       (dispatch [:clear-complete-items linked-component-keyword]))}
+                                       (when onclick-callback
+                                         (onclick-callback %)))}
                        item])
                     @items-to-autocomplete)))))))
