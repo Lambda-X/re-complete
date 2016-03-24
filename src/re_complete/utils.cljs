@@ -1,19 +1,13 @@
 (ns re-complete.utils
   (:require [clojure.string :as string]))
 
-(defn regex-char-esc-smap
-  "Escapes characters in string by \\ and |"
-  [string]
-  (let [esc-chars string]
-    (zipmap esc-chars
-            (map #(str "\\" % "|") esc-chars))))
-
 (defn str-to-pattern
   "Functions transform given string to pattern"
   [string]
   (->> string
-       (replace (regex-char-esc-smap string))
-       (reduce str)
+       (map (partial str "\\"))
+       (interpose "|")
+       (apply str)
        re-pattern))
 
 
