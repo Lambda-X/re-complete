@@ -4,9 +4,11 @@
 
 
 (defn case-sensitivity [case-sensitive? dictionary-item input]
-  (if case-sensitive?
-    (string/starts-with? dictionary-item input)
-    (string/starts-with? (string/lower-case dictionary-item) (string/lower-case input))))
+  (if (= input "")
+    nil
+    (if case-sensitive?
+      (string/starts-with? dictionary-item input)
+      (string/starts-with? (string/lower-case dictionary-item) (string/lower-case input)))))
 
 (defn items-to-complete
   "List of the items to autocomplete by given input and list of the all items"
@@ -33,23 +35,21 @@
       ""
       current-word-item)))
 
-(defn completions
-  "Autocomplete options for word"
-  [input dictionary options]
-  (let [last-string (last (string/split input #" "))
-        trim-chars (:trim-chars options)
-        sort-fn (:sort-fn options)
-        case-sensitive? (:case-sensitive? options)
-        complete-items (items-to-complete case-sensitive? dictionary last-string)]
-    (vec
-     (if trim-chars
-       (if (= (first last-string) (re-find (utils/str-to-pattern trim-chars) (str (first last-string))))
-         (->> 1
-              (subs last-string)
-              (items-to-complete case-sensitive? dictionary)
-              (sort-by sort-fn))
-         (sort-by sort-fn complete-items))
-       (sort-fn complete-items)))))
+(defn opening-excluded-chars [word excluded-chars]
+  (if ((set (map #(= (first word) %) excluded-chars)) true)
+    (opening-excluded-chars (apply str (rest word)) excluded-chars)
+    word))
+
+(defn closing-excluded-chars [word excluded-chars]
+  (if ((set (map #(= (last word) %) excluded-chars)) true)
+    (closing-excluded-chars (apply str (butlast word)) excluded-chars)
+    word))
+
+(defn completions [word dictionary {:keys [trim-chars sort-fn case-sensitive?]}]
+  (let [new-text (-> word
+                     (opening-excluded-chars trim-chars)
+                     (closing-excluded-chars trim-chars))]
+    (sort-by sort-fn (items-to-complete case-sensitive? dictionary new-text))))
 
 (defn words-to-index
   "Words to change index"
@@ -82,11 +82,11 @@
   [index-in-word word word-to-complete trim-chars]
   (let [partitioned-by-trimmed-chars (vec (utils/partition-by-regexp word trim-chars))
         index-of-part-to-complete (-> index-in-word
-                                          inc
-                                          (take word)
-                                          (utils/partition-by-regexp trim-chars)
-                                          count
-                                          dec)]
+                                      inc
+                                      (take word)
+                                      (utils/partition-by-regexp trim-chars)
+                                      count
+                                      dec)]
     (->> (update-in partitioned-by-trimmed-chars [index-of-part-to-complete]
                     #(str word-to-complete))
          (string/join ""))))
@@ -96,7 +96,7 @@
   [index trim-chars text word-to-complete]
   (->> (update-in (string/split text #" ") [(index-of-word index text)]
                   #(complete-word-with-trimmed-chars (index-in-word index text)
-                                                         %
-                                                         word-to-complete
-                                                         trim-chars))
+                                                     %
+                                                     word-to-complete
+                                                     trim-chars))
        (string/join " ")))
