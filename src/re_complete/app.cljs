@@ -31,7 +31,10 @@
                                                    (take (inc index))
                                                    (reduce str))
                                               #" "))]
-    (if (string/blank? (last input))
+    (if (->> input
+             (take (inc index))
+             last
+             (string/blank?))
       ""
       current-word-item)))
 
