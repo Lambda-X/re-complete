@@ -21,7 +21,7 @@
                  ;; Dev deps
                  [org.clojure/clojure         "1.7.0"]
                  [org.clojure/clojurescript   "1.7.228"]
-                 [reagent                     "0.5.0"]
+                 [reagent                     "0.6.0-alpha"]
                  [re-frame                    "0.7.0-alpha-3"]])
 
 (require
