@@ -9,8 +9,6 @@
 
 (def trim-chars-default "")
 
-(def sort-fn-default first)
-
 (def case-sensitive-default false)
 
 ;; --- Handlers ---
@@ -18,30 +16,15 @@
 (register-handler
  :options
  (fn [db [_ linked-component-key options]]
-   (let [sort-fn (:sort-fn options)
-         trim-chars (:trim-chars options)
+   (let [trim-chars (:trim-chars options)
          case-sensitive? (:case-sensitive? options)
-         filled-options (cond (and trim-chars sort-fn case-sensitive?) options
-                              (and trim-chars case-sensitive?) {:trim-chars trim-chars
-                                                                :case-sensitive? true
-                                                                :sort-fn sort-fn-default}
-                              (and case-sensitive? sort-fn) {:case-sensitive? true
-                                                             :sort-fn sort-fn
-                                                             :trim-chars trim-chars-default}
-                              (and trim-chars sort-fn) {:trim-chars trim-chars
-                                                        :sort-fn sort-fn
-                                                        :case-sensitive? case-sensitive-default}
+         filled-options (cond (and trim-chars case-sensitive?) {:trim-chars trim-chars
+                                                                :case-sensitive? true}
                               trim-chars {:trim-chars trim-chars
-                                          :sort-fn sort-fn-default
-                                          :case-sensitive? case-sensitive-default}
-                              sort-fn {:sort-fn sort-fn
-                                       :trim-chars trim-chars-default
-                                       :case-sensitive? case-sensitive-default}
+                                          :case-sensitive? case-sensitive-default} 
                               case-sensitive? {:case-sensitive? true
-                                               :trim-chars trim-chars-default
-                                               :sort-fn sort-fn-default}
-                              :else {:trim-chars trim-chars-default
-                                     :sort-fn sort-fn-default
+                                               :trim-chars trim-chars-default}
+                              :else {:trim-chars trim-chars-default 
                                      :case-sensitive? case-sensitive-default})]
      (assoc-in db [:autocomplete :linked-components (keyword linked-component-key)] {:options filled-options}))))
 

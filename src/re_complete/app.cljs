@@ -48,11 +48,11 @@
     (closing-excluded-chars (apply str (butlast word)) excluded-chars)
     word))
 
-(defn completions [word dictionary {:keys [trim-chars sort-fn case-sensitive?]}]
+(defn completions [word dictionary {:keys [trim-chars case-sensitive?]}]
   (let [new-text (-> word
                      (opening-excluded-chars trim-chars)
                      (closing-excluded-chars trim-chars))]
-    (sort-by sort-fn (items-to-complete case-sensitive? dictionary new-text))))
+    (items-to-complete case-sensitive? dictionary new-text)))
 
 (defn words-to-index
   "Words to change index"

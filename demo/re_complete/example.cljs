@@ -48,8 +48,7 @@
 
 ;; --- VIEW --- ;;
 
-(def my-lists [["vegetable" dictionary/vegetables {:trim-chars "[]()"
-                                                   :sort-fn count}]
+(def my-lists [["vegetable" dictionary/vegetables {:trim-chars "[]()"}]
                ["fruit" dictionary/fruits {:trim-chars "?"
                                            :case-sensitive? true}]
                ["grain" dictionary/grains]])
