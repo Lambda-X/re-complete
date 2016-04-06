@@ -26,41 +26,41 @@
                                                :trim-chars trim-chars-default}
                               :else {:trim-chars trim-chars-default 
                                      :case-sensitive? case-sensitive-default})]
-     (assoc-in db [:autocomplete :linked-components (keyword linked-component-key)] {:options filled-options}))))
+     (assoc-in db [:re-complete :linked-components (keyword linked-component-key)] {:options filled-options}))))
 
 (register-handler
  :dictionary
  (fn [db [_ linked-component-key dictionary]]
-   (assoc-in db [:autocomplete :linked-components (keyword linked-component-key) :dictionary] dictionary)))
+   (assoc-in db [:re-complete :linked-components (keyword linked-component-key) :dictionary] dictionary)))
 
 (register-handler
  :input
  (fn [db [_ linked-component-key input]]
    (let [linked-component-keyword (keyword linked-component-key)
-         previous-input (get-in db [:autocomplete :linked-components linked-component-keyword :text])
-         options (get-in db [:autocomplete :linked-components linked-component-keyword :options])
-         dictionary (get-in db [:autocomplete :linked-components linked-component-keyword :dictionary])
+         previous-input (get-in db [:re-complete :linked-components linked-component-keyword :text])
+         options (get-in db [:re-complete :linked-components linked-component-keyword :options])
+         dictionary (get-in db [:re-complete :linked-components linked-component-keyword :dictionary])
          index (app/index previous-input input)
          current-word (app/current-word input index)]
      (-> db
-         (assoc-in [:autocomplete :linked-components linked-component-keyword :text] input)
-         (assoc-in [:autocomplete :linked-components linked-component-keyword :change-index] index)
-         (assoc-in [:autocomplete :linked-components linked-component-keyword :current-word] current-word)
-         (assoc-in [:autocomplete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))))))
+         (assoc-in [:re-complete :linked-components linked-component-keyword :text] input)
+         (assoc-in [:re-complete :linked-components linked-component-keyword :change-index] index)
+         (assoc-in [:re-complete :linked-components linked-component-keyword :current-word] current-word)
+         (assoc-in [:re-complete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))))))
 
 (register-handler
  :clear-complete-items
  (fn [db [_ linked-component-key]]
-   (assoc-in db [:autocomplete :linked-components linked-component-key :completions] [])))
+   (assoc-in db [:re-complete :linked-components linked-component-key :completions] [])))
 
 
 (register-handler
  :add-completed-word
  (fn [db [_ linked-component-key selected-word]]
-   (update-in db [:autocomplete :linked-components linked-component-key :text]
+   (update-in db [:re-complete :linked-components linked-component-key :text]
               #(app/complete-word-to-string
-                (get-in db [:autocomplete :linked-components linked-component-key :change-index])
-                (get-in db [:autocomplete :linked-components linked-component-key :options :trim-chars])
+                (get-in db [:re-complete :linked-components linked-component-key :change-index])
+                (get-in db [:re-complete :linked-components linked-component-key :options :trim-chars])
                 %
                 selected-word))))
 
@@ -69,9 +69,9 @@
 (register-sub
  :get-previous-input
  (fn [db [_ linked-component-key]]
-   (reaction (get-in @db [:autocomplete :linked-components (keyword linked-component-key) :text]))))
+   (reaction (get-in @db [:re-complete :linked-components (keyword linked-component-key) :text]))))
 
 (register-sub
  :get-items-to-complete
  (fn [db [_ linked-component-key]]
-   (reaction (get-in @db [:autocomplete :linked-components linked-component-key :completions]))))
+   (reaction (get-in @db [:re-complete :linked-components linked-component-key :completions]))))

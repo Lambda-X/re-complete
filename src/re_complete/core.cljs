@@ -10,16 +10,16 @@
    (completions linked-component-key nil))
   ([linked-component-key onclick-callback]
    (let [linked-component-keyword (keyword linked-component-key)
-         items-to-autocomplete (subscribe [:get-items-to-complete linked-component-keyword])
+         items-to-re-complete (subscribe [:get-items-to-complete linked-component-keyword])
          current-word (subscribe [:get-previous-input linked-component-keyword])]
      (fn []
        (when-not (string/blank? @current-word)
-         (into [:ul.autocompletion-list]
+         (into [:ul.re-completion-list]
                (map (fn [item]
-                      [:li.autocompletion-item
+                      [:li.re-completion-item
                        {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                        (dispatch [:clear-complete-items linked-component-keyword])
                                        (when onclick-callback
                                          (onclick-callback %)))}
                        item])
-                    @items-to-autocomplete)))))))
+                    @items-to-re-complete)))))))

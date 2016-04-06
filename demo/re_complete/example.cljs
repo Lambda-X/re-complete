@@ -35,7 +35,7 @@
  :clear-input
  (fn
    [db [_ linked-component-key]]
-   (assoc-in db [:autocomplete :linked-components (keyword linked-component-key) :text] "")))
+   (assoc-in db [:re-complete :linked-components (keyword linked-component-key) :text] "")))
 
 ;; --- Subscription Handlers ---
 
@@ -68,7 +68,7 @@
      (dispatch [:dictionary list-name dictionary])
      (fn []
        [:div {:className (str list-name " my-list")}
-        [:div {:className "panel panel-default autocomplete"}
+        [:div {:className "panel panel-default re-complete"}
          [:div {:className "panel-heading"}
           [:h1 (string/capitalize (str list-name "s"))]]
          [:div.panel-body
@@ -86,7 +86,7 @@
                                       (dispatch [:clear-input list-name]))}
               [:span {:className "glyphicon glyphicon-ok check"}]]]]
            (list-view @get-list)]]
-         [:div.autocompletion-list-part
+         [:div.re-completion-list-part
           [re-complete/completions list-name]]]]))))
 
 (defn my-app []

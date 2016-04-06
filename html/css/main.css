@@ -24,15 +24,15 @@ li.item {list-style: none;
          color: #585858;
          font-weight: bold;}
 
-li.autocompletion-item {list-style: none;}
+li.re-completion-item {list-style: none;}
 
-.autocompletion-list-part {position: absolute;
+.re-completion-list-part {position: absolute;
                            float: right;
                            left: 50px;
                            top: 150px;
                            z-index: 100;}
 
-ul.autocompletion-list {Background: #eee;
+ul.re-completion-list {Background: #eee;
                         padding-left: 15px;
                         padding-right: 15px;
                         border-radius: 5px;}
@@ -40,7 +40,7 @@ ul.autocompletion-list {Background: #eee;
     display: inline-block;
     margin-left: 30px;}
 
-.autocomplete {
+.re-complete {
     position: relative;
     display: inline-block;
     margin-top: 50px;
@@ -48,7 +48,7 @@ ul.autocompletion-list {Background: #eee;
     width: 500px;
     min-height: 300px;}
 
-.autocomplete h1 {
+.re-complete h1 {
     text-align: center;
     font-style: italic;
     /* width: auto; */
