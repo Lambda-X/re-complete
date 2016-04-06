@@ -69,7 +69,6 @@ When the change of input occurred (for example we will write `a` to input), in o
                              :completions ["appricot" "asparagus"]
                              :dictionary '("broccoli" "asparagus" "appricot" "cale")
                              :options {:trim-chars "()",
-                                       :sort-fn count
                                        :case-sensitive? false}}}}}
 ```
 
