@@ -21,7 +21,7 @@ sensitive, you should set `case-sensitive? true`
 
 # Usage
 
-The re-autocomplete library has only few functions:
+The re-complete library has only few functions:
 
 For setting the `options` you need to `dispatch` your `options` (`:trim-chars` `:case-sensitive?`). 
 All dispatch functions takes as argument `:linked-component-key` (name for the input) and `options`
