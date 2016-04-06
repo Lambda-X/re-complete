@@ -1,7 +1,7 @@
 # re-complete
 re-complete is a text completion library for re-frame applications
 
-[![via Clojars](http://clojars.org/re-complete/latest-version.svg)](http://clojars.org/replumb)
+[![via Clojars](http://clojars.org/re-complete/latest-version.svg)](http://clojars.org/re-complete)
 
 This library provides the possibilty to set `trim-chars` and `case-sensitive?` through options. Using the `trim-chars` option,
 the user can describe which type of characters he wants to ignore at the beginning and at the end of the word.
@@ -43,11 +43,10 @@ This dispatch function takes as arguments `linked-component-key` (name for the i
 ```Clojure
 (dispatch [:options list-name input])
 ```
-[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L62)
+[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L61)
 
 ```clojure
-((dispatch [:options "vegetable" {:trim-chars "()",
-                                  :sort-fn count}])
+((dispatch [:options "vegetable" {:trim-chars "()",}])
  (dispatch [:dictionary "vegetable" '("broccoli" "asparagus" "appricot" "cale")])
      (fn []
         [:ul
@@ -55,15 +54,15 @@ This dispatch function takes as arguments `linked-component-key` (name for the i
             [:input {:type "text"
                      :value ""
                      :on-change (fn [event]
-                                  (dispatch [:input list-name (.. event -target -value)]))}]]]
-            [:div.autocompletion-list-part
+                                  (dispatch [:input "vegetable" (.. event -target -value)]))}]]]
+            [:div.re-completion-list-part
           [re-complete/completions "vegetable]]))
 ```
 
 When the change of input occurred (for example we will write `a` to input), in our app-state we will have
 
 ```clojure
-{:autocomplete {:linked-components                                                                                                                                                                          
+{:re-complete {:linked-components                                                                                                                                                                          
                 {:vegetable {:text ""
                              :change-index 0
                              :current-word "a"
@@ -82,16 +81,16 @@ If you want to use custom callback function, you can add it as additional option
 `completions` takes as an argument `linked-component-key` - name of the input and optional argument `onclick-callback`
 
 
-[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L91)
+[example of the use](https://github.com/ScalaConsultants/re-complete/blob/master/demo/re_complete/example.cljs#L89)
 
 ```clojure
-[:div.autocompletion-list-part
-  [autocomplete/completions "vegetable"]]
+[:div.re-completion-list-part
+  [re-complete/completions "vegetable"]]
 ```
 
 # CSS styling
 
-The `autocompletion-list` function renders `ul` with class `autocompletion-list` and `li` items with class `autocompletion-item`.
+The `re-completion-list` function renders `ul` with class `re-completion-list` and `li` items with class `re-completion-item`.
 
 Enjoy the library!
 
