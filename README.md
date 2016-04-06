@@ -1,11 +1,13 @@
 # re-complete
 re-complete is a text completion library for re-frame applications
 
-Library provides the possibilty to set `trim-chars`, `sort-fn` and `case-sensitive?` through options. Using the `trim-chars` option,
+[![via Clojars](http://clojars.org/re-complete/latest-version.svg)](http://clojars.org/replumb)
+
+This library provides the possibilty to set `trim-chars` and `case-sensitive?` through options. Using the `trim-chars` option,
 the user can describe which type of characters he wants to ignore at the beginning and at the end of the word.
 
-For example, if the `trim-chars` has a value `"()"` , the first eligible item of the input to autocomplete
-will be the first item after the `(` ,or `)`.
+For example, if the `trim-chars` has a value `"()"`, the first eligible item of the input to autocomplete
+will be the first item after the `(` or `)`.
 
 ![alt tag](http://s21.postimg.org/hc3lopv6v/Screen_Shot_2016_03_14_at_15_13_14.png)
 
@@ -14,19 +16,15 @@ The list of the items to autocomplete is empty because in my autocompletion-data
 
 ![alt tag](http://s14.postimg.org/90jw4k7a9/Screen_Shot_2016_03_14_at_15_13_27.png)
 
-The `sort-fn` option should be the function for sorting items in the autocompletion list.
-For example if the value of the `sort-fn` will be `count`, the items to autocomplete will be sorted by the count of their characters.
-If the `sort-fn` option is not provided, items to autocomplete are sorted by natural order (alphabetically).
-
 The `case-sentitive?` option has a default value `false`. So if you want your autocomplete to be case
 sensitive, you should set `case-sensitive? true`
 
 # Usage
 
-The re-autocomplete library has only few functions you need to use.
+The re-autocomplete library has only few functions:
 
-For setting the `options` you need to `dispatch` your `options` (`trim-chars` `sort-fn` `case-sensitive?`). 
-This dispatch function takes as argument `linked-component-key` (name for the input) and `options`
+For setting the `options` you need to `dispatch` your `options` (`:trim-chars` `:case-sensitive?`). 
+All dispatch functions takes as argument `:linked-component-key` (name for the input) and `options`
 
 ```Clojure
 (dispatch [:options list-name options])
