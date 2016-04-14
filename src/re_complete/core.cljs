@@ -13,13 +13,14 @@
          items-to-re-complete (subscribe [:get-items-to-complete linked-component-keyword])
          current-word (subscribe [:get-previous-input linked-component-keyword])]
      (fn []
-       (when-not (string/blank? @current-word)
-         (into [:ul.re-completion-list]
-               (map (fn [item]
-                      [:li.re-completion-item
-                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
-                                       (dispatch [:clear-complete-items linked-component-keyword])
-                                       (when onclick-callback
-                                         (onclick-callback %)))}
-                       item])
-                    @items-to-re-complete)))))))
+       (when-not (empty? @items-to-re-complete)
+         (when-not (string/blank? @current-word)
+           (into [:ul.re-completion-list]
+                 (map (fn [item]
+                        [:li.re-completion-item
+                         {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
+                                         (dispatch [:clear-complete-items linked-component-keyword])
+                                         (when onclick-callback
+                                           (onclick-callback %)))}
+                         item])
+                      @items-to-re-complete))))))))
