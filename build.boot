@@ -40,7 +40,7 @@
 (task-options!
  pom {:project 're-complete
       :version +version+
-      :url "https://github.com/ScalaConsultants/re-complete"
+      :url "https://github.com/Lambda-X/re-complete"
       :description "Autocomplete plugin"
       :license {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}}
  test-cljs {:js-env :phantom})
