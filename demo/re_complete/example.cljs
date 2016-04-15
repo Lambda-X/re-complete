@@ -1,7 +1,6 @@
 (ns re-complete.example
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-complete.core :as re-complete]
-            [re-complete.handlers :as handlers]
             [re-complete.dictionary :as dictionary]
             [reagent.core :as reagent]
             [re-frame.core :refer [register-handler

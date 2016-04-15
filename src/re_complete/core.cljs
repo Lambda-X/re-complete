@@ -1,5 +1,6 @@
 (ns re-complete.core
   (:require [re-complete.app :as app]
+            [re-complete.handlers :as handlers]
             [re-frame.core :refer [dispatch subscribe]]
             [clojure.string :as string]))
 
