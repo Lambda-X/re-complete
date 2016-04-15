@@ -1,6 +1,8 @@
 (ns re-complete.app
   (:require [re-complete.utils :as utils]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [goog.events :as events]
+            [re-frame.core :refer [dispatch]]))
 
 
 (defn case-sensitivity [case-sensitive? dictionary-item input]
@@ -103,3 +105,55 @@
                                                      word-to-complete
                                                      trim-chars))
        (string/join " ")))
+
+
+(defn clear-complete-items [db linked-component-key]
+  (assoc-in db [:re-complete :linked-components linked-component-key :completions] []))
+
+(defn clear-selected-item [db linked-component-key]
+  (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] nil))
+
+(defn select-next-item [db linked-component-key]
+  (let [suggestion-list (get-in db [:re-complete :linked-components linked-component-key :completions])
+        suggestion-indexed-vector (map-indexed vector suggestion-list)
+        selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
+        next-selected-item-index (inc (first selected-item))
+        new-selected-item (if-not selected-item
+                            (first suggestion-indexed-vector)
+                            (if (= (count suggestion-list) next-selected-item-index)
+                              (first suggestion-indexed-vector)
+                              (nth suggestion-indexed-vector next-selected-item-index)))]
+    (-> db
+        (assoc-in [:re-complete :linked-components linked-component-key :selected-item] new-selected-item))))
+
+(defn select-previous-item [db linked-component-key]
+  (let [suggestion-list (get-in db [:re-complete :linked-components linked-component-key :completions])
+        suggestion-indexed-vector (map-indexed vector suggestion-list)
+        selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
+        previous-selected-item-index (dec (first selected-item))
+        new-selected-item (if-not selected-item
+                            (last suggestion-indexed-vector)
+                            (if (= (count suggestion-list) previous-selected-item-index)
+                              (last suggestion-indexed-vector)
+                              (nth suggestion-indexed-vector previous-selected-item-index)))]
+    (-> db
+        (assoc-in [:re-complete :linked-components linked-component-key :selected-item] new-selected-item))))
+
+(defn add-completed-word [db linked-component-key selected-word]
+  (do (-> db
+          (update-in [:re-complete :linked-components linked-component-key :text]
+                     #(complete-word-to-string
+                       (get-in db [:re-complete :linked-components linked-component-key :change-index])
+                       (get-in db [:re-complete :linked-components linked-component-key :options :trim-chars])
+                       %
+                       selected-word)) 
+          (clear-complete-items linked-component-key)
+          (clear-selected-item linked-component-key))))
+
+(defn keys-handling [linked-component-key onclick-callback]
+  (events/listen js/window "keydown"
+                 (fn [e]
+                   (let [key-code (.-keyCode e)]
+                     (when (#{13 38 40 9} key-code)
+                       (.preventDefault e)
+                       (dispatch [:keys-handling linked-component-key key-code onclick-callback]))))))

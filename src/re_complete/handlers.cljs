@@ -2,8 +2,8 @@
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-frame.core :refer [register-handler
                                    register-sub
-                                   dispatch]]
-            [goog.events :as events]
+                                   dispatch
+                                   subscribe]]
             [re-complete.app :as app]))
 
 
@@ -21,12 +21,17 @@
          filled-options (cond (and trim-chars case-sensitive?) {:trim-chars trim-chars
                                                                 :case-sensitive? true}
                               trim-chars {:trim-chars trim-chars
-                                          :case-sensitive? case-sensitive-default} 
+                                          :case-sensitive? case-sensitive-default}
                               case-sensitive? {:case-sensitive? true
                                                :trim-chars trim-chars-default}
-                              :else {:trim-chars trim-chars-default 
+                              :else {:trim-chars trim-chars-default
                                      :case-sensitive? case-sensitive-default})]
      (assoc-in db [:re-complete :linked-components (keyword linked-component-key)] {:options filled-options}))))
+
+(register-handler
+ :focus
+ (fn [db [_ linked-component-key focus?]]
+   (assoc-in db [:re-complete :linked-components (keyword linked-component-key) :focus] focus?)))
 
 (register-handler
  :dictionary
@@ -49,20 +54,24 @@
          (assoc-in [:re-complete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))))))
 
 (register-handler
- :clear-complete-items
- (fn [db [_ linked-component-key]]
-   (assoc-in db [:re-complete :linked-components linked-component-key :completions] [])))
-
-
-(register-handler
  :add-completed-word
  (fn [db [_ linked-component-key selected-word]]
-   (update-in db [:re-complete :linked-components linked-component-key :text]
-              #(app/complete-word-to-string
-                (get-in db [:re-complete :linked-components linked-component-key :change-index])
-                (get-in db [:re-complete :linked-components linked-component-key :options :trim-chars])
-                %
-                selected-word))))
+   (app/add-completed-word db linked-component-key selected-word)))
+
+(register-handler
+ :keys-handling
+ (fn [db [_ linked-component-key key-code onclick-callback]]
+   (let [selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
+         items-to-complete (get-in db [:re-complete :linked-components linked-component-key :completions])
+         focus? (get-in db [:re-complete :linked-components linked-component-key :focus])]
+     (if focus?
+       (cond (= key-code 40) (app/select-next-item db linked-component-key)
+             (= key-code 38) (app/select-previous-item db linked-component-key)
+             (= key-code 13) (do (when onclick-callback (onclick-callback))
+                                 (app/add-completed-word db linked-component-key (second selected-item)))
+             (= key-code 9) (do (when onclick-callback (onclick-callback))
+                                (app/add-completed-word db linked-component-key (first items-to-complete))))
+       db))))
 
 ;; --- Subscriptions ---
 
@@ -75,3 +84,8 @@
  :get-items-to-complete
  (fn [db [_ linked-component-key]]
    (reaction (get-in @db [:re-complete :linked-components linked-component-key :completions]))))
+
+(register-sub
+ :get-selected-item
+ (fn [db [_ linked-component-key]]
+   (reaction (get-in @db [:re-complete :linked-components linked-component-key :selected-item]))))

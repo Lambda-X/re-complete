@@ -1,6 +1,7 @@
 (ns re-complete.example
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-complete.core :as re-complete]
+            [re-complete.handlers :as handlers]
             [re-complete.dictionary :as dictionary]
             [reagent.core :as reagent]
             [re-frame.core :refer [register-handler
@@ -50,7 +51,7 @@
 
 (def my-lists [["vegetable" (sort dictionary/vegetables) {:trim-chars "[]()"}]
                ["fruit" (sort-by count dictionary/fruits) {:trim-chars "?"
-                                              :case-sensitive? true}]
+                                                           :case-sensitive? true}]
                ["grain" dictionary/grains]])
 
 (defn list-view [items]
@@ -79,7 +80,9 @@
                      :placeholder (str list-name " name")
                      :value @get-input
                      :on-change (fn [event]
-                                  (dispatch [:input list-name (.. event -target -value)]))}
+                                  (dispatch [:input list-name (.. event -target -value)]))
+                     :on-focus #(dispatch [:focus list-name true])
+                     :on-blur #(dispatch [:focus list-name false])}
              [:button {:type "button"
                        :className "btn btn-default button-ok"
                        :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
