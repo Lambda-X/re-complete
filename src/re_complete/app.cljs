@@ -154,6 +154,6 @@
   (events/listen js/window "keydown"
                  (fn [e]
                    (let [key-code (.-keyCode e)]
-                     (when (#{13 38 40 9} key-code)
+                     (when (#{13 38 40 9 32} key-code)
                        (.preventDefault e)
                        (dispatch [:keys-handling linked-component-key key-code onclick-callback]))))))
