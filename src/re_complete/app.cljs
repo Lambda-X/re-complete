@@ -133,7 +133,7 @@
         previous-selected-item-index (dec (first selected-item))
         new-selected-item (if-not selected-item
                             (last suggestion-indexed-vector)
-                            (if (= (count suggestion-list) previous-selected-item-index)
+                            (if (= -1 previous-selected-item-index)
                               (last suggestion-indexed-vector)
                               (nth suggestion-indexed-vector previous-selected-item-index)))]
     (-> db
