@@ -149,9 +149,9 @@
   [db linked-component-key]
   (assoc-in db [:re-complete :linked-components linked-component-key :completions] []))
 
-(defn scrolling-down [linked-component-key selected-item-index node current-view]
-  (let [number-of-visible-items 4
-        one-item-height 20
+(defn scrolling-down [linked-component-key selected-item-index node current-view options]
+  (let [number-of-visible-items (:visible-items options)
+        one-item-height (:item-height options)
         selected-item-number (+ 1 selected-item-index)]
     (cond (> selected-item-number number-of-visible-items) (do (set! (.-scrollTop node) (* selected-item-number one-item-height))
                                                                (swap! current-view (partial mapv inc)))
@@ -159,14 +159,12 @@
                                          (reset! current-view [1 4]))
           :else nil)))
 
-(defn scrolling-up [linked-component-key selected-item-index node current-view items-to-complete]
-  (let [previous-item (subscribe [:get-selected-item linked-component-key])
-        previous-item-index (+ 1 (first @previous-item))
-        number-of-visible-items 4
-        number-of-items-to-complete (count items-to-complete)
-        one-item-height 20
+(defn scrolling-up [linked-component-key selected-item-index node current-view items-to-complete options]
+  (let [number-of-items-to-complete (count items-to-complete)
+        one-item-height (:item-height options)
         selected-item-number (+ 1 selected-item-index)
         current-position (* selected-item-number one-item-height)]
+    (.log js/console one-item-height)
     (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* 4 one-item-height)))
                                                              (swap! current-view (partial mapv dec)))
           (> selected-item-number (last @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
