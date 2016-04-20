@@ -34,8 +34,9 @@
 
 
 (defn setup-key-handling [this linked-component-key onclick-callback]
-  (let [node (reagent/dom-node this)]
-    (app/keys-handling (keyword linked-component-key) onclick-callback node)))
+  (let [node (reagent/dom-node this)
+        current-view (atom [0 4])]
+    (app/keys-handling (keyword linked-component-key) onclick-callback node current-view)))
 
 (defn completions
   ([linked-component-key]

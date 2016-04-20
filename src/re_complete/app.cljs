@@ -113,31 +113,27 @@
 (defn clear-selected-item [db linked-component-key]
   (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] nil))
 
-(defn select-next-item [db linked-component-key]
+(defn next-item [db linked-component-key]
   (let [suggestion-list (get-in db [:re-complete :linked-components linked-component-key :completions])
         suggestion-indexed-vector (map-indexed vector suggestion-list)
         selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
-        next-selected-item-index (inc (first selected-item))
-        new-selected-item (if-not selected-item
-                            (first suggestion-indexed-vector)
-                            (if (= (count suggestion-list) next-selected-item-index)
-                              (first suggestion-indexed-vector)
-                              (nth suggestion-indexed-vector next-selected-item-index)))]
-    (-> db
-        (assoc-in [:re-complete :linked-components linked-component-key :selected-item] new-selected-item))))
+        next-selected-item-index (inc (first selected-item))]
+    (if-not selected-item
+      (first suggestion-indexed-vector)
+      (if (= (count suggestion-list) next-selected-item-index)
+        (first suggestion-indexed-vector)
+        (nth suggestion-indexed-vector next-selected-item-index)))))
 
-(defn select-previous-item [db linked-component-key]
+(defn previous-item [db linked-component-key]
   (let [suggestion-list (get-in db [:re-complete :linked-components linked-component-key :completions])
         suggestion-indexed-vector (map-indexed vector suggestion-list)
         selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
-        previous-selected-item-index (dec (first selected-item))
-        new-selected-item (if-not selected-item
-                            (last suggestion-indexed-vector)
-                            (if (= -1 previous-selected-item-index)
-                              (last suggestion-indexed-vector)
-                              (nth suggestion-indexed-vector previous-selected-item-index)))]
-    (-> db
-        (assoc-in [:re-complete :linked-components linked-component-key :selected-item] new-selected-item))))
+        previous-selected-item-index (dec (first selected-item))]
+    (if-not selected-item
+      (last suggestion-indexed-vector)
+      (if (= -1 previous-selected-item-index)
+        (last suggestion-indexed-vector)
+        (nth suggestion-indexed-vector previous-selected-item-index)))))
 
 (defn add-completed-word [db linked-component-key selected-word]
   (do (-> db
@@ -150,17 +146,34 @@
           (clear-complete-items linked-component-key)
           (clear-selected-item linked-component-key))))
 
-(defn scrolling [linked-component-key selected-item node]
+(defn scrolling-down [linked-component-key selected-item-index node current-view]
   (let [number-of-visible-items 4
         one-item-height 20
-        selected-item-number (+ 1 (first selected-item))]
-    (when (> selected-item-number (- number-of-visible-items 1))
-      (set! (.-scrollTop node) (* selected-item-number one-item-height)))))
+        selected-item-number (+ 1 selected-item-index)]
+    (cond (> selected-item-number number-of-visible-items) (do (set! (.-scrollTop node) (* selected-item-number one-item-height))
+                                                               (swap! current-view (partial mapv inc)))
+          (= selected-item-number 1) (do (set! (.-scrollTop node) 0)
+                                         (reset! current-view [1 4]))
+          :else nil)))
 
-(defn keys-handling [linked-component-key onclick-callback node]
+(defn scrolling-up [linked-component-key selected-item-index node current-view items-to-complete]
+  (let [previous-item (subscribe [:get-selected-item linked-component-key])
+        previous-item-index (+ 1 (first @previous-item))
+        number-of-visible-items 4
+        number-of-items-to-complete (count items-to-complete)
+        one-item-height 20
+        selected-item-number (+ 1 selected-item-index)
+        current-position (* selected-item-number one-item-height)]
+    (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* 4 one-item-height)))
+                                                             (swap! current-view (partial mapv dec)))
+          (> selected-item-number (last @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
+                                                            (reset! current-view [(- number-of-items-to-complete 3) number-of-items-to-complete]))
+          :else nil)))
+
+(defn keys-handling [linked-component-key onclick-callback node current-view]
   (events/listen js/window "keydown"
                  (fn [e]
                    (let [key-code (.-keyCode e)]
                      (when (#{13 38 40 9} key-code)
                        (.preventDefault e)
-                       (dispatch [:keys-handling linked-component-key key-code onclick-callback node]))))))
+                       (dispatch [:keys-handling linked-component-key key-code onclick-callback node current-view]))))))
