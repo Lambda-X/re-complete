@@ -150,14 +150,22 @@
           (clear-complete-items linked-component-key)
           (clear-selected-item linked-component-key))))
 
+(defn clear-completions
+  [db linked-component-key]
+  (assoc-in db [:re-complete :linked-components linked-component-key :completions] []))
+
 (defn keys-handling [linked-component-key onclick-callback]
   (.addEventListener js/window "keydown"
-                     (let [items (subscribe [:get-items-to-complete linked-component-key])]
+                     (let [items (subscribe [:get-items-to-complete linked-component-key])
+                           selected (subscribe [:get-selected-item linked-component-key])]
                        (fn [e]
                          (let [key-code (.-keyCode e)]
                            (when (and (#{13 38 40 9 27} key-code)
                                       (seq @items))
-                             (dispatch [:keys-handling linked-component-key key-code onclick-callback])
-                             (.stopPropagation e)
-                             (.preventDefault e)))))
+                             (if-not (and (= 13 key-code) (nil? @selected))
+                               (do
+                                 (dispatch [:keys-handling linked-component-key key-code onclick-callback])
+                                 (.stopPropagation e)
+                                 (.preventDefault e))
+                               (dispatch [:clear-completions linked-component-key]))))))
                      true))
