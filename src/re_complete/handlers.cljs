@@ -18,14 +18,21 @@
  (fn [db [_ linked-component-key options]]
    (let [trim-chars (:trim-chars options)
          case-sensitive? (:case-sensitive? options)
+         keys-handling (if (:keys-handling options)
+                         (:keys-handling options)
+                         (:keys-handling nil))
          filled-options (cond (and trim-chars case-sensitive?) {:trim-chars trim-chars
-                                                                :case-sensitive? true}
+                                                                :case-sensitive? true
+                                                                :keys-handling keys-handling}
                               trim-chars {:trim-chars trim-chars
-                                          :case-sensitive? case-sensitive-default}
+                                          :case-sensitive? case-sensitive-default
+                                          :keys-handling keys-handling}
                               case-sensitive? {:case-sensitive? true
-                                               :trim-chars trim-chars-default}
+                                               :trim-chars trim-chars-default
+                                               :keys-handling keys-handling}
                               :else {:trim-chars trim-chars-default
-                                     :case-sensitive? case-sensitive-default})]
+                                     :case-sensitive? case-sensitive-default
+                                     :keys-handling keys-handling})]
      (assoc-in db [:re-complete :linked-components (keyword linked-component-key)] {:options filled-options}))))
 
 (register-handler
@@ -70,13 +77,17 @@
          items-to-complete (get-in db [:re-complete :linked-components linked-component-key :completions])
          focus? (get-in db [:re-complete :linked-components linked-component-key :focus])
          next-item (app/next-item db linked-component-key)
-         previous-item (app/previous-item db linked-component-key)]
+         previous-item (app/previous-item db linked-component-key)
+         options (get-in db [:re-complete :linked-components linked-component-key :options])]
+     (.log js/console (str options))
      (if focus?
        (cond (= key-code 40) (let [db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] next-item)]
-                               (app/scrolling-down linked-component-key (first next-item) node current-view)
+                               (when (:keys-handling options)
+                                 (app/scrolling-down linked-component-key (first next-item) node current-view (:keys-handling options)))
                                db)
              (= key-code 38) (let [db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] previous-item)]
-                               (app/scrolling-up linked-component-key (first previous-item) node current-view items-to-complete)
+                               (when (:keys-handling options)
+                                 (app/scrolling-up linked-component-key (first previous-item) node current-view items-to-complete (:keys-handling options)))
                                db)
              (= key-code 13) (let [db (app/add-completed-word db linked-component-key (second selected-item))]
                                (when onclick-callback (onclick-callback))
