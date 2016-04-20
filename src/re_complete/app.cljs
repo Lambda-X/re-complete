@@ -2,7 +2,7 @@
   (:require [re-complete.utils :as utils]
             [clojure.string :as string]
             [goog.events :as events]
-            [re-frame.core :refer [dispatch]]))
+            [re-frame.core :refer [dispatch subscribe]]))
 
 
 (defn case-sensitivity [case-sensitive? dictionary-item input]
@@ -150,16 +150,17 @@
           (clear-complete-items linked-component-key)
           (clear-selected-item linked-component-key))))
 
-(defn scrolling [linked-component-key]
-  (let [selected-word (subscribe [:selected-item linked-component-key])
-        number-of-visible-items 4
-        one-item-height 20]
-    (set! (.-scrollTop node) 100) ))
+(defn scrolling [linked-component-key selected-item node]
+  (let [number-of-visible-items 4
+        one-item-height 20
+        selected-item-number (+ 1 (first selected-item))]
+    (when (> selected-item-number (- number-of-visible-items 1))
+      (set! (.-scrollTop node) (* selected-item-number one-item-height)))))
 
 (defn keys-handling [linked-component-key onclick-callback node]
   (events/listen js/window "keydown"
                  (fn [e]
                    (let [key-code (.-keyCode e)]
-                     (when (#{13 38 40 9 32} key-code)
+                     (when (#{13 38 40 9} key-code)
                        (.preventDefault e)
                        (dispatch [:keys-handling linked-component-key key-code onclick-callback node]))))))
