@@ -27,15 +27,23 @@ li.item {list-style: none;
 li.re-completion-item {list-style: none;}
 
 .re-completion-list-part {position: absolute;
-                           float: right;
-                           left: 50px;
-                           top: 150px;
-                           z-index: 100;}
+                          float: right;
+                          left: 50px;
+                          top: 150px;
+                          z-index: 100;}
 
-ul.re-completion-list {Background: #eee;
-                        padding-left: 15px;
-                        padding-right: 15px;
-                        border-radius: 5px;}
+ul.re-completion-list {
+    max-height: 80px;
+    min-height: 80px;
+    min-width: 200px;
+    overflow-y: scroll;
+    background: #eee;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 5px;
+
+}
+
 .my-list {
     display: inline-block;
     margin-left: 30px;}
