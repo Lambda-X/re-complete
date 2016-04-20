@@ -59,6 +59,11 @@
    (app/add-completed-word db linked-component-key selected-word)))
 
 (register-handler
+ :clear-completions
+ (fn [db [_ linked-component-key]]
+   (app/clear-completions db linked-component-key)))
+
+(register-handler
  :keys-handling
  (fn [db [_ linked-component-key key-code onclick-callback]]
    (let [selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
@@ -73,7 +78,7 @@
              (= key-code 9) (let [db (app/add-completed-word db linked-component-key (first items-to-complete))]
                               (when onclick-callback (onclick-callback))
                               db)
-             (= key-code 27) (assoc-in db [:re-complete :linked-components linked-component-key :completions] []))
+             (= key-code 27) (app/clear-completions db linked-component-key))
        db))))
 
 ;; --- Subscriptions ---
