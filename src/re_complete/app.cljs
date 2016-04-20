@@ -146,7 +146,7 @@
                        (get-in db [:re-complete :linked-components linked-component-key :change-index])
                        (get-in db [:re-complete :linked-components linked-component-key :options :trim-chars])
                        %
-                       selected-word)) 
+                       selected-word))
           (clear-complete-items linked-component-key)
           (clear-selected-item linked-component-key))))
 
@@ -156,4 +156,7 @@
                    (let [key-code (.-keyCode e)]
                      (when (#{13 38 40 9} key-code)
                        (.preventDefault e)
-                       (dispatch [:keys-handling linked-component-key key-code onclick-callback]))))))
+                       (if (or (= key-code 13) (= key-code 9))
+                         (do (dispatch [:keys-handling linked-component-key key-code])
+                             (when onclick-callback (onclick-callback)))
+                         (dispatch [:keys-handling linked-component-key key-code])))))))

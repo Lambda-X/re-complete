@@ -60,17 +60,15 @@
 
 (register-handler
  :keys-handling
- (fn [db [_ linked-component-key key-code onclick-callback]]
+ (fn [db [_ linked-component-key key-code]]
    (let [selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
          items-to-complete (get-in db [:re-complete :linked-components linked-component-key :completions])
          focus? (get-in db [:re-complete :linked-components linked-component-key :focus])]
      (if focus?
        (cond (= key-code 40) (app/select-next-item db linked-component-key)
              (= key-code 38) (app/select-previous-item db linked-component-key)
-             (= key-code 13) (do (when onclick-callback (onclick-callback))
-                                 (app/add-completed-word db linked-component-key (second selected-item)))
-             (= key-code 9) (do (when onclick-callback (onclick-callback))
-                                (app/add-completed-word db linked-component-key (first items-to-complete))))
+             (= key-code 13) (app/add-completed-word db linked-component-key (second selected-item))
+             (= key-code 9) (app/add-completed-word db linked-component-key (first items-to-complete)))
        db))))
 
 ;; --- Subscriptions ---
