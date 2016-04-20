@@ -60,7 +60,7 @@
 
 (register-handler
  :keys-handling
- (fn [db [_ linked-component-key key-code onclick-callback]]
+ (fn [db [_ linked-component-key key-code onclick-callback node]]
    (let [selected-item (get-in db [:re-complete :linked-components linked-component-key :selected-item])
          items-to-complete (get-in db [:re-complete :linked-components linked-component-key :completions])
          focus? (get-in db [:re-complete :linked-components linked-component-key :focus])]
@@ -70,7 +70,9 @@
              (= key-code 13) (do (when onclick-callback (onclick-callback))
                                  (app/add-completed-word db linked-component-key (second selected-item)))
              (= key-code 9) (do (when onclick-callback (onclick-callback))
-                                (app/add-completed-word db linked-component-key (first items-to-complete))))
+                                (app/add-completed-word db linked-component-key (first items-to-complete)))
+             (= key-code 32) (do (set! (.-scrollTop node) 100) 
+                                 db))
        db))))
 
 ;; --- Subscriptions ---

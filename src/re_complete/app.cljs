@@ -146,14 +146,20 @@
                        (get-in db [:re-complete :linked-components linked-component-key :change-index])
                        (get-in db [:re-complete :linked-components linked-component-key :options :trim-chars])
                        %
-                       selected-word)) 
+                       selected-word))
           (clear-complete-items linked-component-key)
           (clear-selected-item linked-component-key))))
 
-(defn keys-handling [linked-component-key onclick-callback]
+(defn scrolling [linked-component-key]
+  (let [selected-word (subscribe [:selected-item linked-component-key])
+        number-of-visible-items 4
+        one-item-height 20]
+    (set! (.-scrollTop node) 100) ))
+
+(defn keys-handling [linked-component-key onclick-callback node]
   (events/listen js/window "keydown"
                  (fn [e]
                    (let [key-code (.-keyCode e)]
                      (when (#{13 38 40 9 32} key-code)
                        (.preventDefault e)
-                       (dispatch [:keys-handling linked-component-key key-code onclick-callback]))))))
+                       (dispatch [:keys-handling linked-component-key key-code onclick-callback node]))))))

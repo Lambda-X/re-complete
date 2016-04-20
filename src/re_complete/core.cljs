@@ -13,7 +13,6 @@
         items-to-re-complete (subscribe [:get-items-to-complete linked-component-keyword])
         current-word (subscribe [:get-previous-input linked-component-keyword])
         selected-item (subscribe [:get-selected-item linked-component-keyword])]
-    (app/keys-handling linked-component-keyword onclick-callback)
     (fn []
       (let [selected @selected-item]
         [:ul.re-completion-list {:style {:display (if (empty? @items-to-re-complete) "none" "block")}}
@@ -34,19 +33,20 @@
                 @items-to-re-complete))]))))
 
 
-(defn setup-key-handling []
-  (fn [this]
-    (let [node (reagent/dom-node this)]
-      (.scrollTop node 20))))
+(defn setup-key-handling [this linked-component-key onclick-callback]
+  (let [node (reagent/dom-node this)]
+       (app/keys-handling (keyword linked-component-key) onclick-callback node)))
 
 (defn completions
   ([linked-component-key]
    (reagent/create-class
-    {:component-did-mount setup-key-handling
+    {:component-did-mount (fn [this]
+                            (setup-key-handling this linked-component-key nil))
      :reagent-render (fn [linked-component-key]
                        (completion-list linked-component-key nil))}))
   ([linked-component-key onclick-callback]
    (reagent/create-class
-    {:component-did-mount setup-key-handling
+    {:component-did-mount (fn [this]
+                            (setup-key-handling this linked-component-key onclick-callback))
      :reagent-render (fn [linked-component-key onclick-callback]
                        (completion-list linked-component-key onclick-callback))})))
