@@ -165,7 +165,7 @@
         one-item-height (:item-height options)
         selected-item-number (+ 1 selected-item-index)
         current-position (* selected-item-number one-item-height)]
-    (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* 4 one-item-height)))
+    (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* number-of-visible-items one-item-height)))
                                                              (swap! current-view (partial mapv dec)))
           (> selected-item-number (last @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
                                                             (reset! current-view [(- number-of-items-to-complete number-of-visible-items) number-of-items-to-complete]))
