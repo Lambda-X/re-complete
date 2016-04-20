@@ -153,8 +153,9 @@
   (let [number-of-visible-items (:visible-items options)
         one-item-height (:item-height options)
         selected-item-number (+ 1 selected-item-index)]
-    (cond (> selected-item-number number-of-visible-items) (do (set! (.-scrollTop node) (* selected-item-number one-item-height))
-                                                               (swap! current-view (partial mapv inc)))
+    (cond (> selected-item-number (second @current-view)) (do (set! (.-scrollTop node) (* selected-item-number one-item-height))
+                                                              (swap! current-view (fn [current-view]
+                                                                                    [(inc (second current-view)) (+ (second current-view) number-of-visible-items)])))
           (= selected-item-number 1) (do (set! (.-scrollTop node) 0)
                                          (reset! current-view [1 number-of-visible-items]))
           :else nil)))
@@ -167,8 +168,8 @@
         current-position (* selected-item-number one-item-height)]
     (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* number-of-visible-items one-item-height)))
                                                              (swap! current-view (partial mapv dec)))
-          (> selected-item-number (last @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
-                                                            (reset! current-view [(- number-of-items-to-complete number-of-visible-items) number-of-items-to-complete]))
+          (> selected-item-number (second @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
+                                                              (reset! current-view [(- number-of-items-to-complete number-of-visible-items) number-of-items-to-complete]))
           :else nil)))
 
 (defn keys-handling [linked-component-key onclick-callback node current-view]
