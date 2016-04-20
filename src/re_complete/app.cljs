@@ -156,19 +156,19 @@
     (cond (> selected-item-number number-of-visible-items) (do (set! (.-scrollTop node) (* selected-item-number one-item-height))
                                                                (swap! current-view (partial mapv inc)))
           (= selected-item-number 1) (do (set! (.-scrollTop node) 0)
-                                         (reset! current-view [1 4]))
+                                         (reset! current-view [1 number-of-visible-items]))
           :else nil)))
 
 (defn scrolling-up [linked-component-key selected-item-index node current-view items-to-complete options]
-  (let [number-of-items-to-complete (count items-to-complete)
+  (let [number-of-visible-items (:visible-items options)
+        number-of-items-to-complete (count items-to-complete)
         one-item-height (:item-height options)
         selected-item-number (+ 1 selected-item-index)
         current-position (* selected-item-number one-item-height)]
-    (.log js/console one-item-height)
     (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* 4 one-item-height)))
                                                              (swap! current-view (partial mapv dec)))
           (> selected-item-number (last @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
-                                                            (reset! current-view [(- number-of-items-to-complete 3) number-of-items-to-complete]))
+                                                            (reset! current-view [(- number-of-items-to-complete number-of-visible-items) number-of-items-to-complete]))
           :else nil)))
 
 (defn keys-handling [linked-component-key onclick-callback node current-view]
