@@ -2,7 +2,7 @@
   (:require [re-complete.utils :as utils]
             [clojure.string :as string]
             [goog.events :as events]
-            [re-frame.core :refer [dispatch]]))
+            [re-frame.core :refer [dispatch subscribe]]))
 
 
 (defn case-sensitivity [case-sensitive? dictionary-item input]
@@ -151,12 +151,13 @@
           (clear-selected-item linked-component-key))))
 
 (defn keys-handling [linked-component-key onclick-callback]
-  (events/listen js/window "keydown"
-                 (fn [e]
-                   (let [key-code (.-keyCode e)]
-                     (when (#{13 38 40 9} key-code)
-                       (.preventDefault e)
-                       (if (or (= key-code 13) (= key-code 9))
-                         (do (dispatch [:keys-handling linked-component-key key-code])
-                             (when onclick-callback (onclick-callback)))
-                         (dispatch [:keys-handling linked-component-key key-code])))))))
+  (.addEventListener js/window "keydown"
+                     (let [items (subscribe [:get-items-to-complete linked-component-key])]
+                       (fn [e]
+                         (let [key-code (.-keyCode e)]
+                           (when (and (#{13 38 40 9 27} key-code)
+                                      (seq @items))
+                             (dispatch [:keys-handling linked-component-key key-code onclick-callback])
+                             (.stopPropagation e)
+                             (.preventDefault e)))))
+                     true))

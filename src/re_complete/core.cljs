@@ -15,8 +15,8 @@
          current-word (subscribe [:get-previous-input linked-component-keyword])
          selected-item (subscribe [:get-selected-item linked-component-keyword])]
      (app/keys-handling linked-component-keyword onclick-callback)
-     (fn [] 
-       (let [selected @selected-item] 
+     (fn []
+       (let [selected @selected-item]
          [:ul.re-completion-list {:style {:display (if (empty? @items-to-re-complete) "none" "block")}}
           (when-not (string/blank? @current-word)
             (map (fn [item]
