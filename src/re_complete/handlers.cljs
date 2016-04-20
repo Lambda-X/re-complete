@@ -79,7 +79,6 @@
          next-item (app/next-item db linked-component-key)
          previous-item (app/previous-item db linked-component-key)
          options (get-in db [:re-complete :linked-components linked-component-key :options])]
-     (.log js/console (str options))
      (if focus?
        (cond (= key-code 40) (let [db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] next-item)]
                                (when (:keys-handling options)
@@ -114,3 +113,8 @@
  :get-selected-item
  (fn [db [_ linked-component-key]]
    (reaction (get-in @db [:re-complete :linked-components linked-component-key :selected-item]))))
+
+(register-sub
+ :get-options
+ (fn [db [_ linked-component-key]]
+   (reaction (get-in @db [:re-complete :linked-components (keyword linked-component-key) :options]))))
