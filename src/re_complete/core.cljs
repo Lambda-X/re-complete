@@ -15,6 +15,8 @@
          selected-item (subscribe [:get-selected-item linked-component-keyword])]
      (fn []
        (let [selected @selected-item]
+         (when (zero? (count @items-to-re-complete))
+           (dispatch [:clear-selected-item linked-component-keyword]))
          [:ul.re-completion-list {:style {:display (if (empty? @items-to-re-complete) "none" "block")}}
           (when-not (string/blank? @current-word)
             (map (fn [item]
