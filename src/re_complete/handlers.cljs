@@ -97,6 +97,14 @@
              (= key-code 27) (app/clear-completions db linked-component-key))
        db))))
 
+(register-handler
+ :selected-item
+ (fn [db [_ linked-component-key hovered-item]]
+   (let [suggestion-list (get-in db [:re-complete :linked-components linked-component-key :completions])
+         suggestion-indexed-vector (map-indexed vector suggestion-list)
+         hovered-item-with-index (first (filter (comp (partial = hovered-item) second) suggestion-indexed-vector))]
+     (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] hovered-item-with-index))))
+
 ;; --- Subscriptions ---
 
 (register-sub

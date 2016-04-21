@@ -30,11 +30,6 @@ li.re-completion-selected {
     list-style: none;
     background-color: gray}
 
-li.re-completion-item:hover {
-    list-style: none;
-    background-color: gray}
-
-
 .re-completion-list-part {
     position: absolute;
     float: right;
@@ -50,9 +45,7 @@ ul.re-completion-list {
     background: #eee;
     padding-left: 15px;
     padding-right: 15px;
-    border-radius: 5px;
-
-}
+    border-radius: 5px;}
 
 .my-list {
     display: inline-block;

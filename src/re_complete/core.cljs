@@ -28,7 +28,8 @@
                      [:li.re-completion-item
                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                       (when onclick-callback
-                                        (onclick-callback)))}
+                                        (onclick-callback)))
+                       :on-mouse-over #(dispatch [:selected-item linked-component-keyword item])}
                       item]))
                  @items-to-re-complete))])))))
 
