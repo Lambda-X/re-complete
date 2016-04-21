@@ -78,15 +78,16 @@
          focus? (get-in db [:re-complete :linked-components linked-component-key :focus])
          next-item (app/next-item db linked-component-key)
          previous-item (app/previous-item db linked-component-key)
-         options (get-in db [:re-complete :linked-components linked-component-key :options])]
+         options (get-in db [:re-complete :linked-components linked-component-key :options])
+         keys-handling (:keys-handling options)] 
      (if focus?
        (cond (= key-code 40) (let [db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] next-item)]
-                               (when (:keys-handling options)
-                                 (app/scrolling-down linked-component-key (first next-item) node current-view (:keys-handling options)))
+                               (when keys-handling
+                                 (app/scrolling-down linked-component-key (first next-item) node current-view keys-handling))
                                db)
              (= key-code 38) (let [db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] previous-item)]
-                               (when (:keys-handling options)
-                                 (app/scrolling-up linked-component-key (first previous-item) node current-view items-to-complete (:keys-handling options)))
+                               (when keys-handling
+                                 (app/scrolling-up linked-component-key (first previous-item) node current-view items-to-complete keys-handling))
                                db)
              (= key-code 13) (let [db (app/add-completed-word db linked-component-key (second selected-item))]
                                (when onclick-callback (onclick-callback))

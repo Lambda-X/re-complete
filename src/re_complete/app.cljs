@@ -148,28 +148,33 @@
   [db linked-component-key]
   (assoc-in db [:re-complete :linked-components linked-component-key :completions] []))
 
-(defn scrolling-down [linked-component-key selected-item-index node current-view options]
-  (let [number-of-visible-items (:visible-items options)
-        one-item-height (:item-height options)
-        selected-item-number (+ 1 selected-item-index)]
+(defn scrolling-down [linked-component-key selected-item-index node current-view keys-handling]
+  (let [number-of-visible-items (:visible-items keys-handling)
+        one-item-height (:item-height keys-handling)
+        selected-item-number (+ 1 selected-item-index)
+        start-current-view (when (= @current-view [0 0])
+                             (reset! current-view [1 number-of-visible-items]))]
     (cond (> selected-item-number (second @current-view)) (do (set! (.-scrollTop node) (* (- selected-item-number 1) one-item-height))
-                                                              (swap! current-view (fn [current-view]
-                                                                                    [(inc (second current-view)) (+ (second current-view) number-of-visible-items)])))
+                                                              (swap! current-view (fn [[_ s]]
+                                                                                    [(inc s) (+ s number-of-visible-items)])))
           (= selected-item-number 1) (do (set! (.-scrollTop node) 0)
                                          (reset! current-view [1 number-of-visible-items]))
           :else nil)))
 
-(defn scrolling-up [linked-component-key selected-item-index node current-view items-to-complete options]
-  (let [number-of-visible-items (:visible-items options)
+(defn scrolling-up [linked-component-key selected-item-index node current-view items-to-complete keys-handling]
+  (let [number-of-visible-items (:visible-items keys-handling)
         number-of-items-to-complete (count items-to-complete)
-        one-item-height (:item-height options)
+        one-item-height (:item-height keys-handling)
         selected-item-number (+ 1 selected-item-index)
-        current-position (* selected-item-number one-item-height)]
-    (cond (< selected-item-number (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* number-of-visible-items one-item-height)))
-                                                             (swap! current-view (partial mapv dec)))
-          (> selected-item-number (second @current-view)) (do (set! (.-scrollTop node) (* one-item-height number-of-items-to-complete))
-                                                              (reset! current-view [(- number-of-items-to-complete number-of-visible-items) number-of-items-to-complete]))
-          :else nil)))
+        current-position (* (+ selected-item-index 1) one-item-height)
+        start-current-view (when (= @current-view [0 0])
+                             (reset! current-view [(- number-of-items-to-complete  number-of-visible-items) number-of-items-to-complete]))]
+    (cond (= (inc selected-item-number) (first @current-view)) (do (set! (.-scrollTop node) (- current-position (* number-of-visible-items one-item-height)))
+                                                         (swap! current-view (fn [[f s]]
+                                                                               [(- f number-of-visible-items) (- s number-of-visible-items)])))
+      (= selected-item-number number-of-items-to-complete) (do (set! (.-scrollTop node) (- (* one-item-height number-of-items-to-complete) 1))
+                                                               (reset! current-view [(- number-of-items-to-complete (dec number-of-visible-items)) number-of-items-to-complete]))
+      :else nil)))
 
 (defn keys-handling [linked-component-key onclick-callback node current-view]
   (.addEventListener js/window "keydown"
