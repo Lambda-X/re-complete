@@ -17,7 +17,7 @@
        (let [selected @selected-item]
          (when (zero? (count @items-to-re-complete))
            (dispatch [:clear-selected-item linked-component-keyword]))
-         [:ul.re-completion-list {:style {:display (if (empty? @items-to-re-complete) "none" "block")}}
+         [:ul.re-completion-list {:style {:visibility (if (empty? @items-to-re-complete) "hidden" "visible")}}
           (when-not (string/blank? @current-word)
             (map (fn [item]
                    (if (= (str (second selected))
