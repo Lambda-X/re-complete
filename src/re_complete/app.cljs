@@ -153,7 +153,7 @@
   (let [number-of-visible-items (:visible-items options)
         one-item-height (:item-height options)
         selected-item-number (+ 1 selected-item-index)]
-    (cond (> selected-item-number (second @current-view)) (do (set! (.-scrollTop node) (* selected-item-number one-item-height))
+    (cond (> selected-item-number (second @current-view)) (do (set! (.-scrollTop node) (* (- selected-item-number 1) one-item-height))
                                                               (swap! current-view (fn [current-view]
                                                                                     [(inc (second current-view)) (+ (second current-view) number-of-visible-items)])))
           (= selected-item-number 1) (do (set! (.-scrollTop node) 0)
