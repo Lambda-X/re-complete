@@ -1,7 +1,6 @@
 (ns re-complete.app
   (:require [re-complete.utils :as utils]
             [clojure.string :as string]
-            [goog.events :as events]
             [re-frame.core :refer [dispatch subscribe]]))
 
 (defn case-sensitivity [case-sensitive? dictionary-item input]

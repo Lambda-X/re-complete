@@ -20,11 +20,13 @@
             (map (fn [item]
                    (if (= (str (second selected))
                           (str item))
+                     ^{:key item}
                      [:li.re-completion-selected
                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                       (when onclick-callback
                                         (onclick-callback)))}
                       item]
+                     ^{:key item}
                      [:li.re-completion-item
                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                       (when onclick-callback
