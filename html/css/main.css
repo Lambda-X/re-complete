@@ -26,11 +26,21 @@ li.item {list-style: none;
 
 li.re-completion-item {list-style: none;}
 
-.re-completion-list-part {position: absolute;
-                          float: right;
-                          left: 50px;
-                          top: 150px;
-                          z-index: 100;}
+li.re-completion-selected {
+    list-style: none;
+    background-color: gray}
+
+li.re-completion-item:hover {
+    list-style: none;
+    background-color: gray}
+
+
+.re-completion-list-part {
+    position: absolute;
+    float: right;
+    left: 50px;
+    top: 150px;
+    z-index: 100;}
 
 ul.re-completion-list {
     max-height: 80px;
