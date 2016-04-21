@@ -57,6 +57,7 @@
 
 (defn list-view [items]
   (map (fn [item]
+         ^{:key item}
          [:li.item item])
        items))
 
@@ -83,12 +84,12 @@
                      :on-change (fn [event]
                                   (dispatch [:input list-name (.. event -target -value)]))
                      :on-focus #(dispatch [:focus list-name true])
-                     :on-blur #(dispatch [:focus list-name false])}
-             [:button {:type "button"
-                       :className "btn btn-default button-ok"
-                       :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
-                                      (dispatch [:clear-input list-name]))}
-              [:span {:className "glyphicon glyphicon-ok check"}]]]]
+                     :on-blur #(dispatch [:focus list-name false])}]
+            [:button {:type "button"
+                      :className "btn btn-default button-ok"
+                      :on-click #(do (dispatch [:add-item-to-list list-name @get-input])
+                                     (dispatch [:clear-input list-name]))}
+             [:span {:className "glyphicon glyphicon-ok check"}]]]
            (list-view @get-list)]]
          [:div.re-completion-list-part
           [re-complete/completions list-name]]]]))))
