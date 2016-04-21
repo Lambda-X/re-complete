@@ -58,7 +58,8 @@
          (assoc-in [:re-complete :linked-components linked-component-keyword :text] input)
          (assoc-in [:re-complete :linked-components linked-component-keyword :change-index] index)
          (assoc-in [:re-complete :linked-components linked-component-keyword :current-word] current-word)
-         (assoc-in [:re-complete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))))))
+         (assoc-in [:re-complete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))
+         (assoc-in [:re-complete :linked-components linked-component-keyword :selected-item] nil)))))
 
 (register-handler
  :add-completed-word
