@@ -12,7 +12,8 @@
    (let [linked-component-keyword (keyword linked-component-key)
          items-to-re-complete (subscribe [:get-items-to-complete linked-component-keyword])
          current-word (subscribe [:get-previous-input linked-component-keyword])
-         selected-item (subscribe [:get-selected-item linked-component-keyword])]
+         selected-item (subscribe [:get-selected-item linked-component-keyword])
+         is-mouse-on-suggestion-list? (subscribe [:is-mouse-on-suggestion-list linked-component-keyword])]
      (fn []
        (let [selected @selected-item]
          (when (zero? (count @items-to-re-complete))
@@ -26,20 +27,23 @@
                      [:li.re-completion-selected
                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                       (when onclick-callback
-                                        (onclick-callback)))}
+                                        (onclick-callback)))
+                       :on-mouse-out #(dispatch [:mouse-on-suggestion-list linked-component-key false])}
                       item]
                      ^{:key item}
                      [:li.re-completion-item
                       {:on-click #(do (dispatch [:add-completed-word linked-component-keyword item])
                                       (when onclick-callback
                                         (onclick-callback)))
-                       :on-mouse-over #(dispatch [:selected-item linked-component-keyword item])}
+                       :on-mouse-over  #(when-not @is-mouse-on-suggestion-list?
+                                          (dispatch [:selected-item linked-component-keyword item]))
+                       :on-mouse-out #(dispatch [:mouse-on-suggestion-list linked-component-key false])}
                       item]))
                  @items-to-re-complete))])))))
 
 (defn setup-key-handling [this linked-component-key onclick-callback]
-  (let [node (reagent/dom-node this) 
-        current-view (atom [0 0])] 
+  (let [node (reagent/dom-node this)
+        current-view (atom [0 0])]
     (app/keys-handling (keyword linked-component-key) onclick-callback node current-view)))
 
 (defn completions

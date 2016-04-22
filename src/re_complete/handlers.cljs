@@ -46,6 +46,11 @@
    (assoc-in db [:re-complete :linked-components (keyword linked-component-key) :dictionary] dictionary)))
 
 (register-handler
+ :mouse-on-suggestion-list
+ (fn [db [_ linked-component-key is-mouse-on-suggestion-list?]]
+   (assoc-in db [:re-complete :linked-components (keyword linked-component-key) :mouse-on-suggestion-list] is-mouse-on-suggestion-list?)))
+
+(register-handler
  :input
  (fn [db [_ linked-component-key input]]
    (let [linked-component-keyword (keyword linked-component-key)
@@ -59,7 +64,8 @@
          (assoc-in [:re-complete :linked-components linked-component-keyword :change-index] index)
          (assoc-in [:re-complete :linked-components linked-component-keyword :current-word] current-word)
          (assoc-in [:re-complete :linked-components linked-component-keyword :completions] (app/completions current-word dictionary options))
-         (assoc-in [:re-complete :linked-components linked-component-keyword :selected-item] nil)))))
+         (assoc-in [:re-complete :linked-components linked-component-keyword :selected-item] nil)
+         (assoc-in [:re-complete :linked-components linked-component-keyword :mouse-on-suggestion-list] false)))))
 
 (register-handler
  :add-completed-word
@@ -86,12 +92,16 @@
          keys-handling (:keys-handling options)]
      (if focus?
        (cond (= key-code 40) (let [next-item (app/next-item db linked-component-key)
-                                   db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] next-item)]
+                                   db (-> db
+                                          (assoc-in [:re-complete :linked-components linked-component-key :selected-item] next-item)
+                                          (assoc-in [:re-complete :linked-components linked-component-key :mouse-on-suggestion-list] true))]
                                (when keys-handling
                                  (app/scrolling-down linked-component-key (first next-item) node current-view keys-handling))
                                db)
              (= key-code 38) (let [previous-item (app/previous-item db linked-component-key)
-                                   db (assoc-in db [:re-complete :linked-components linked-component-key :selected-item] previous-item)]
+                                   db (-> db
+                                          (assoc-in [:re-complete :linked-components linked-component-key :selected-item] previous-item)
+                                          (assoc-in [:re-complete :linked-components linked-component-key :mouse-on-suggestion-list] true))]
                                (when keys-handling
                                  (app/scrolling-up linked-component-key (first previous-item) node current-view items-to-complete keys-handling))
                                db)
@@ -133,3 +143,8 @@
  :get-options
  (fn [db [_ linked-component-key]]
    (reaction (get-in @db [:re-complete :linked-components (keyword linked-component-key) :options]))))
+
+(register-sub
+ :is-mouse-on-suggestion-list
+ (fn [db [_ linked-component-key]]
+   (reaction (get-in @db [:re-complete :linked-components (keyword linked-component-key) :mouse-on-suggestion-list]))))
