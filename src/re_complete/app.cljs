@@ -75,10 +75,9 @@
   (if (= (count (words-to-index index text)) 1)
     index
     (->> (words-to-index index text)
-         drop-last
-         (string/join "")
-         count inc
-         (- index))))
+         last
+         count
+         dec)))
 
 (defn complete-word-with-trimmed-chars
   "Autocomplete word and ignore regex at the beginning and at the end of the word"
