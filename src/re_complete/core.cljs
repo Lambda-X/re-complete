@@ -13,12 +13,15 @@
          items-to-re-complete (subscribe [:get-items-to-complete linked-component-keyword])
          current-word (subscribe [:get-previous-input linked-component-keyword])
          selected-item (subscribe [:get-selected-item linked-component-keyword])
-         is-mouse-on-suggestion-list? (subscribe [:is-mouse-on-suggestion-list linked-component-keyword])]
+         is-mouse-on-suggestion-list? (subscribe [:is-mouse-on-suggestion-list linked-component-keyword])
+         focus? (subscribe [:focus? linked-component-key])]
      (fn []
+       (.log js/console (not @focus?))
        (let [selected @selected-item]
          (when (zero? (count @items-to-re-complete))
            (dispatch [:clear-selected-item linked-component-keyword]))
-         [:ul.re-completion-list {:style {:visibility (if (empty? @items-to-re-complete) "hidden" "visible")}}
+         [:ul {:className (str "re-completion-list " linked-component-key)
+               :style {:visibility (if (or (not @focus?) (empty? @items-to-re-complete)) "hidden" "visible")}}
           (when-not (string/blank? @current-word)
             (map (fn [item]
                    (if (= (str (second selected))

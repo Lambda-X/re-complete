@@ -148,3 +148,8 @@
  :is-mouse-on-suggestion-list
  (fn [db [_ linked-component-key]]
    (reaction (get-in @db [:re-complete :linked-components (keyword linked-component-key) :mouse-on-suggestion-list]))))
+
+(register-sub
+ :focus?
+ (fn [db [_ linked-component-key]]
+   (reaction (get-in @db [:re-complete :linked-components (keyword linked-component-key) :focus]))))
